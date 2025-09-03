@@ -2,13 +2,13 @@
  * 工具基本信息
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import cn from 'classnames';
 import { get, isEmpty } from 'lodash';
 import { Form, Button, Input, Checkbox, Select, message, Tag, Modal, Radio } from 'coding-oa-uikit';
 import EditIcon from 'coding-oa-uikit/lib/icon/Edit';
-import { formatDateTime } from '@tencent/micro-frontend-shared/util';
-import Authority from '@tencent/micro-frontend-shared/component/authority';
+import { formatDateTime, formScmURLSecValidate } from '@tencent/micro-frontend-shared/util';
+import AuthFormItem from '@tencent/micro-frontend-shared/tca/user-auth/auth-form-item';
 
 // 项目内
 import { updateTool, updateToolStatus } from '@src/services/tools';
@@ -16,7 +16,7 @@ import {
   AuthTypeEnum, ToolStatusEnum, SCM_PLATFORM_CHOICES, AUTH_TYPE_CHOICES,
   TOOL_STATUS_OPTIONS, TOOL_STATUS_CHOICES, REPO_TYPE_OPTIONS, SCM_MAP,
 } from '@src/constant';
-import { UserAPI } from '@plat/api';
+import { userAuthAPI } from '@plat/api';
 import style from '../style.scss';
 
 const { TextArea } = Input;
@@ -38,7 +38,6 @@ const BaseInfo = ({ orgSid, data, editable, getDetail }: BaseInfoProps) => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const statusRef = useRef();
-  const { t } = useTranslation();
 
   useEffect(() => {
     form.resetFields();
@@ -204,6 +203,7 @@ const BaseInfo = ({ orgSid, data, editable, getDetail }: BaseInfoProps) => {
                       noStyle
                       rules={[
                         { required: true, message: t('请输入工具仓库地址') },
+                        formScmURLSecValidate,
                       ]}
                     >
                       <Input style={{ width: '84%' }} />
@@ -217,16 +217,12 @@ const BaseInfo = ({ orgSid, data, editable, getDetail }: BaseInfoProps) => {
         }
         {
           getComponent(
-            <Authority
+            <AuthFormItem
               form={form}
               name='scm_auth_id'
               label={t('凭证')}
-              getAuthList={[
-                UserAPI.authSSH().get,
-                UserAPI.authAccount().get,
-                UserAPI.getOAuthInfos,
-                UserAPI.getPlatformStatus,
-              ]}
+              userAuthAPI={userAuthAPI}
+              authinfo={data.scm_auth}
               selectStyle={{ width: 360 }}
               allowClear
             />,

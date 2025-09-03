@@ -2,14 +2,14 @@
  * 新增/编辑弹框
  */
 import React, { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import cn from 'classnames';
 import { isEmpty, compact } from 'lodash';
 import { Modal, Form, Select, Input, Tag, Tooltip, message, Checkbox } from 'coding-oa-uikit';
 import PlusIcon from 'coding-oa-uikit/lib/icon/Plus';
 import TrashIcon from 'coding-oa-uikit/lib/icon/Trash';
 
-import { LIB_ENV, LibTypeEnum, LIB_TYPE } from '@src/constant';
+import { LIB_ENV_CHOICES, LibTypeEnum, LIB_TYPE_CHOICES, LibData } from '@src/constant';
 import { getToolLibs, addToolSchemes, updateToolSchemes } from '@src/services/tools';
 
 import style from './style.scss';
@@ -37,9 +37,8 @@ interface UpdateLibSchemeModalProps {
 
 const UpdateLibSchemeModal = (props: UpdateLibSchemeModalProps) => {
   const { orgSid, toolId, visible, initData, toolSchemes, onClose, callback } = props;
-  const { t } = useTranslation();
   const [form] = Form.useForm();
-  const [toolLibs, setToolLibs] = useState<Array<any>>([]);
+  const [toolLibs, setToolLibs] = useState<Array<LibData>>([]);
   const [fields, setFields] = useState<Array<any>>(defaultFields);
   const [maxFieldKey, setMaxFieldKey] = useState<number>(0);  // tool_libs max key
   const isEdit = initData && !isEmpty(initData);
@@ -194,7 +193,7 @@ const UpdateLibSchemeModal = (props: UpdateLibSchemeModalProps) => {
               getLibs({ os: values?.join(',') });
             }}>
             {
-              Object.entries(LIB_ENV).map(([key, text]) => (
+              Object.entries(LIB_ENV_CHOICES).map(([key, text]) => (
                 <Option key={key} value={key}>{text}</Option>
               ))
             }
@@ -227,7 +226,7 @@ const UpdateLibSchemeModal = (props: UpdateLibSchemeModalProps) => {
                         <div className={style.lib}>
                           <span>{item.name}</span>
                           <Tag className={cn(style.libTag, { [style.privite]: item.lib_type === LibTypeEnum.PRIVATE })}
-                          >{LIB_TYPE[item.lib_type]}</Tag>
+                          >{LIB_TYPE_CHOICES[item.lib_type]}</Tag>
                         </div>
                       </Option>
                     ))}

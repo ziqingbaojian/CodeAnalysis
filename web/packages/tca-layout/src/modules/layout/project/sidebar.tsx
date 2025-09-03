@@ -1,9 +1,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import Repos from 'coding-oa-uikit/lib/icon/Repos';
 import Scan from 'coding-oa-uikit/lib/icon/Scan';
-import Template from 'coding-oa-uikit/lib/icon/Template';
 import Api from 'coding-oa-uikit/lib/icon/Api';
 import Group from 'coding-oa-uikit/lib/icon/Group';
 import TeamOverview from 'coding-oa-uikit/lib/icon/TeamOverview';
@@ -12,25 +11,24 @@ import LayoutMenu from '@src/component/layout-menu';
 import { getApiDocURL } from '@plat/util';
 
 const SiderBar = () => {
-  const { t } = useTranslation();
   const { orgSid, name }: any = useParams();
 
-  return <LayoutMenu breakpoint='md'
+  return <LayoutMenu breakpoint="lg"
     menus={[
       {
-        icon: <Repos />,
+        icon: <Repos className='layoutMenuItemIcon' />,
         title: t('仓库登记'),
         link: `/t/${orgSid}/p/${name}/repos`,
         key: 'repos',
         regexMatch: /^\/t\/[^/]+\/p\/[^/]+\/repos/i,
       },
       {
-        icon: <Scan />,
+        icon: <Scan className='layoutMenuItemIcon' />,
         title: t('代码分析'),
         key: 'code-analysis',
         childrens: [
           {
-            title: t('分支项目'),
+            title: t('分析项目'),
             link: `/t/${orgSid}/p/${name}/code-analysis/repos/projects`,
             key: 'projects',
             regexMatch: /(^\/t\/[^/]+\/p\/[^/]+\/code-analysis\/repos\/\d+\/projects)|(^\/t\/[^/]+\/p\/[^/]+\/code-analysis\/repos\/projects)/i,
@@ -44,26 +42,19 @@ const SiderBar = () => {
         ],
       },
       {
-        icon: <Template />,
-        title: t('分析方案模板'),
-        link: `/t/${orgSid}/p/${name}/template`,
-        key: 'template',
-        regexMatch: /^\/t\/[^/]+\/p\/[^/]+\/template/i,
-      },
-      {
         title: '',
         key: 'divider-1',
         divider: true,
       },
       {
-        icon: <TeamOverview />,
+        icon: <TeamOverview className='layoutMenuItemIcon' />,
         title: t('项目概览'),
         link: `/t/${orgSid}/p/${name}/profile`,
         key: 'profile',
         regexMatch: /^\/t\/[^/]+\/p\/[^/]+\/profile/i,
       },
       {
-        icon: <Group />,
+        icon: <Group className='layoutMenuItemIcon' />,
         title: t('项目成员'),
         link: `/t/${orgSid}/p/${name}/group`,
         key: 'group',
@@ -75,7 +66,7 @@ const SiderBar = () => {
         divider: true,
       },
       {
-        icon: <Api />,
+        icon: <Api className='layoutMenuItemIcon' />,
         title: t('开放平台'),
         link: getApiDocURL(),
         key: 'docs',

@@ -16,7 +16,7 @@ const { FormItem } = Form;
 
 /** 判断是否存在不为空的筛选参数 */
 const isExistSearchParam = (params: FilterParams) => Object.keys(params)
-  .some((key: string) => typeof params[key] === 'number' || !isEmpty(params[key]));
+  .some((key: string) => typeof params[key] === 'number' || !isEmpty(params[key]) || params[key] === true);
 
 /** search 组件 表单类型 */
 export type SearchFormFieldType = 'input' | 'select' | 'datepicker' | 'checkbox' | 'multiselect' | 'rangepicker';
@@ -36,6 +36,8 @@ export interface SearchFormField extends FilterField {
   /** select options，仅type为select时生效 */
   options?: any[];
   /** select 可选择，仅type为select时生效 */
+  keys?: any;
+  /** select 可选择，仅type为select时生效 */
   filterable?: boolean;
   /** 表单样式 */
   style?: React.CSSProperties;
@@ -49,7 +51,7 @@ interface SearchProps {
   /** 筛选参数，传入参数 */
   searchParams: FilterParams;
   /** 筛选请求加载中 */
-  loading: boolean;
+  loading?: boolean;
   /** 筛选回调 */
   callback?: (params: any) => void;
   /** 是否开启路由跳转，默认开启 */
@@ -60,6 +62,8 @@ interface SearchProps {
   style?: React.CSSProperties;
   /** 首行额外内容 */
   extraContent?: React.ReactNode;
+  /** 尾部额外内容 */
+  appendContent?: React.ReactNode;
   /** 筛选项 */
   filters?: FilterField[];
   /** 默认筛选键值对 */
@@ -71,8 +75,8 @@ const formLayout = {
 };
 
 const Search = ({
-  fields, moreFields, searchParams, loading, callback,
-  className, style, extraContent, route = true, filters,
+  fields, moreFields, searchParams, loading = false, callback,
+  className, style, extraContent, route = true, filters, appendContent,
   defaultValues,
 }: SearchProps) => {
   const [more, setMore] = useState(false);
@@ -152,6 +156,7 @@ const Search = ({
           clearable={!field.defaultValue}
           placeholder={field.placeholder || '全部'}
           options={field.options}
+          keys={field.keys}
           onChange={value => onChange(field.name, value)} />;
       case 'multiselect':
         return <Select
@@ -161,6 +166,7 @@ const Search = ({
           loading={field.loading}
           placeholder={field.placeholder || '全部'}
           options={field.options}
+          keys={field.keys}
           onChange={value => onChange(field.name, value)} />;
       case 'datepicker':
         return <DatePicker
@@ -197,7 +203,7 @@ const Search = ({
       <div className={classnames(s.search, className)} style={style}>
         <Form
           className={s.searchContent}
-          labelWidth={60}
+          labelWidth='auto'
           style={{ width: '100%' }}
           ref={formRef}
         >
@@ -239,6 +245,7 @@ const Search = ({
                 </Button>
               </Col>
             }
+            {appendContent && <Col>{appendContent}</Col>}
           </Row>
           {moreFields && more && <Row gutter={[16, 8]} style={{ marginTop: '8px' }}>
             {moreFields

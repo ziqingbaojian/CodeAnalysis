@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -13,7 +13,7 @@ import { Button, message, Modal } from 'coding-oa-uikit';
 import SelectBorderless from '@src/components/select-borderless';
 import { SEVERITY, RESOLUTIONS } from '../constants';
 
-import { getProjectMembers } from '@src/utils';
+import { useProjectMembers } from '@src/utils/hooks';
 import {
   updateIssueAuthor,
   updateIssueSeverity,
@@ -60,7 +60,7 @@ const DetailRight = (props: DetailRightProps) => {
     scrollToLine,
   } = props;
   const isHandled = data.state === 2;
-  const members = getProjectMembers();
+  const members = useProjectMembers();
 
   useEffect(() => {
     getRecords();
@@ -173,7 +173,7 @@ const DetailRight = (props: DetailRightProps) => {
           <a onClick={() => {
             openDetail(data.checkrule_gid);
           }}>
-            {data.checkrule_display_name}
+            {data.checkrule_real_name}
           </a>
         </div>
         <div className={style.item}>

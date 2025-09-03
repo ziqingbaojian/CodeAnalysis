@@ -1,16 +1,17 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
 // ==============================================================================
 
 /**
- * description      分支项目请求
+ * description      分析项目请求
  * author           luochunlan@coding.net
  * create at        2020-10-23
  */
-import { get, post, put, del } from './index';
-import { MAIN_SERVER_API, getMainBaseURL } from './common';
+import { get, post, put, del } from '@plat/api';
+import { MAIN_SERVER_API } from '@src/constant/api';
+import { getMainBaseURL } from './common';
 
 /**
  * 获取http凭证列表
@@ -43,8 +44,9 @@ export const postRepo = (orgSid: string, name: string, data: any) => post(`${get
 /**
  * 认证方式
  * @param repoId: 代码库id
+ * @param scmAuth
  */
-export const putRepoAuth = (orgSid: string, teamName: string, repoId: any, data: any) => put(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/auth/`, data);
+export const putRepoAuth = (orgSid: string, teamName: string, repoId: any, scmAuth: any) => put(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/auth/`, { scm_auth: scmAuth });
 
 /**
  * 获取代码库概览
@@ -59,6 +61,16 @@ export const getRepo = (orgSid: string, teamName: string, repoId: any) => get(`$
 export const putRepo = (orgSid: string, teamName: string, repoId: any, data: any) => put(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/`, data);
 
 /**
+ * 获取代码库成员
+ * @param orgSid
+ * @param teamName
+ * @param repoId
+ * @returns
+ */
+export const getRepoMembers = (orgSid: string, teamName: string, repoId: any) => get(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/memberconf/`);
+
+
+/**
  * 添加代码库成员
  * @param orgSid
  * @param teamName
@@ -69,7 +81,31 @@ export const putRepo = (orgSid: string, teamName: string, repoId: any, data: any
 export const postRepoMembers = (orgSid: string, teamName: string, repoId: any, data: any) => post(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/memberconf/`, data);
 
 /**
+ * 删除代码库成员
+ * @param orgSid
+ * @param teamName
+ * @param repoId
+ * @param username
+ * @returns
+ */
+export const delRepoMembers = (orgSid: string, teamName: string, repoId: any, username: string) => del(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/memberconf/1/${username}/`);
+
+/**
  * 删除代码库
  * @param repoId: 代码库id
  */
 export const delRepo = (orgSid: string, teamName: string, repoId: any) => del(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/`);
+
+/**
+ * 关注关注代码库
+ * @param repoId
+ * @returns
+ */
+export const subscribedRepo = (orgSid: string, teamName: string, repoId: number) => post(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/subscribed/`, {});
+
+/**
+ * 取消关注代码库
+ * @param repoId
+ * @returns
+ */
+export const cancelSubscribedRepo = (orgSid: string, teamName: string, repoId: number) => del(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/subscribed/`);

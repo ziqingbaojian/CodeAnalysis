@@ -1,13 +1,9 @@
 /**
  * Job 任务列表页面
- * biz-start
- * 目前适用于全平台
- * biz-end
  */
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Row, Col, Tabs } from 'tdesign-react';
 import Search from '@tencent/micro-frontend-shared/tdesign-component/search';
+import PageHeader from '@tencent/micro-frontend-shared/tdesign-component/page-header';
 import { useURLParams, useFetch } from '@tencent/micro-frontend-shared/hooks';
 
 // 项目内
@@ -18,12 +14,8 @@ import { JOB_FILTER_FIELDS as filterFields, JOB_SEARCH_FIELDS, JOB_MORE_SEARCH_F
 import JobTable from './job-table';
 import CancelJobModal from './cancel-job-modal';
 import { JobData } from './types';
-import s from '../style.scss';
-
-const { TabPanel } = Tabs;
 
 const Jobs = () => {
-  const { t } = useTranslation();
   const { filter, currentPage, pageSize, searchParams } = useURLParams(filterFields);
   const [{ data, isLoading }, reload] = useFetch(jobAPI.get, [filter]);
   const { results: listData = [], count = 0 } = data || {};
@@ -44,13 +36,7 @@ const Jobs = () => {
 
   return (
     <>
-      <Row className={s.header} align="middle">
-        <Col flex="auto">
-          <Tabs defaultValue="project" size="large">
-            <TabPanel label={t('分析记录列表')} value="project" />
-          </Tabs>
-        </Col>
-      </Row>
+      <PageHeader title="分析记录列表" description="平台全部分析任务列表" />
       <Search
         fields={JOB_SEARCH_FIELDS}
         moreFields={JOB_MORE_SEARCH_FIELDS}

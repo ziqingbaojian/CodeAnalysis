@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -10,7 +10,7 @@ login - models
 """
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, UserManager
 
 from login.lib.Cipher import base62_cipher
 from login.lib.snowflake import IdWorker, GenerateId
@@ -37,6 +37,8 @@ class UserInfo(AbstractBaseUser):
         (1, "male"),
         (0, "unknown")
     )
+
+    objects = UserManager()
 
     uid = models.CharField(max_length=20, primary_key=True, default=gen_id, unique=True)
     nickname = models.CharField(max_length=1000)

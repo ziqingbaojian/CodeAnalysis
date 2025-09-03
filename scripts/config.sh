@@ -37,7 +37,7 @@ export TCA_APP_DATA_DIR=${TCA_APP_DATA_DIR}
 # Main工程配置
 ## 框架配置
 export MAIN_DEBUG_MODE=true
-export HTTPS_CLONE_FLAG=
+export HTTPS_CLONE_FLAG=true
 export MAIN_SECRET_KEY='lh+6y8pyf16bbor*)p=kp=p(cg615+y+5nnin$l(n%os$8z^v%'
 
 ## 服务DB配置
@@ -140,3 +140,21 @@ export API_TICKET_TOKEN='tca@public@2021'
 ## ScmProxy
 export SCMPROXY_HOST="127.0.0.1"
 export SCMPROXY_PORT=8009
+
+## LDAP相关配置
+## Notice：如果要开启LDAP 认证，请根据实际情况配置以下参数
+## LDAP_ENABLE  默认关闭，开启请设置为true
+## LDAP_BIND_DN  LDAP管理员账号，如果允许匿名访问则不需要设置
+## LDAP_BIND_PASSWORD  LDAP管理员密码 如果允许匿名访问则不需要设置
+## LDAP_SERVER  ldap服务器地址
+## LDAP_PORT  ldap默认端口号 389 如果需要更改请重新设置
+## LDAP_BASE_DN  ldap 基础 DN
+## LDAP_USER_SEARCH_FILTER  用户搜索过滤器
+
+export LDAP_ENABLE=${LDAP_ENABLE:-false}
+export LDAP_BIND_DN=""
+export LDAP_BIND_PASSWORD=""
+export LDAP_SERVER=""
+export LDAP_PORT=389
+export LDAP_BASE_DN=""
+export LDAP_USER_SEARCH_FILTER=""

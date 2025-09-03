@@ -8,16 +8,10 @@
             "java"
         ],
         "labels": [
-            "推荐"
+            "推荐",
+            "增强"
         ],
         "checkrule_set": [
-            {
-                "checktool": "jaff",
-                "checkrule": "AudioRecordInit",
-                "severity": "warning",
-                "rule_params": null,
-                "state": "enabled"
-            },
             {
                 "checktool": "jaff",
                 "checkrule": "camera1API",
@@ -40,20 +34,6 @@
                 "state": "enabled"
             },
             {
-                "checktool": "jaaf",
-                "checkrule": "DeriveCheckIQConfigProcessorHandler",
-                "severity": "warning",
-                "rule_params": null,
-                "state": "enabled"
-            },
-            {
-                "checktool": "jaaf",
-                "checkrule": "DeriveCheckIQConfigProcessorThread",
-                "severity": "warning",
-                "rule_params": null,
-                "state": "enabled"
-            },
-            {
                 "checktool": "jaff",
                 "checkrule": "DynamicAPICameraManager",
                 "severity": "warning",
@@ -161,13 +141,6 @@
             {
                 "checktool": "jafc",
                 "checkrule": "DynamicAPIWifiRttManager",
-                "severity": "warning",
-                "rule_params": null,
-                "state": "enabled"
-            },
-            {
-                "checktool": "jaff",
-                "checkrule": "DynamicPermissionsActionImageCapture",
                 "severity": "warning",
                 "rule_params": null,
                 "state": "enabled"

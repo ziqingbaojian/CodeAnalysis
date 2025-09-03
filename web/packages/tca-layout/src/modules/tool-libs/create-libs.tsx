@@ -7,11 +7,12 @@ import { Modal, Form, Input, Select, Tooltip, Button, message, Space } from 'cod
 import TrashIcon from 'coding-oa-uikit/lib/icon/Trash';
 import QuestionCircle from 'coding-oa-uikit/lib/icon/QuestionCircle';
 import AttentionIcon from 'coding-oa-uikit/lib/icon/AttentionRed';
-import Authority from '@tencent/micro-frontend-shared/component/authority';
-import { UserAPI } from '@plat/api';
+import AuthFormItem from '@tencent/micro-frontend-shared/tca/user-auth/auth-form-item';
+import { userAuthAPI } from '@plat/api';
 
+import { formScmURLSecValidate } from '@tencent/micro-frontend-shared/util';
 import { addToolLib, getLibDetail, updateToolLib } from '@src/services/tools';
-import { TOOLLIB_REPO_TYPE_OPTIONS, RepoTypeEnum, SCM_MAP, LIB_ENV, LIB_TYPE } from '@src/constant';
+import { TOOLLIB_REPO_TYPE_OPTIONS, RepoTypeEnum, SCM_MAP, LIB_ENV_CHOICES, LIB_TYPE_CHOICES } from '@src/constant';
 
 import style from './style.scss';
 
@@ -162,7 +163,7 @@ const CreateToollibs = (props: CreateToollibsProps) => {
             >
               <Select>
                 {
-                  Object.entries(LIB_TYPE).map(([key, text]) => (
+                  Object.entries(LIB_TYPE_CHOICES).map(([key, text]) => (
                     <Option key={key} value={key}>{text}</Option>
                   ))
                 }
@@ -177,7 +178,7 @@ const CreateToollibs = (props: CreateToollibsProps) => {
         >
           <Select mode='multiple'>
             {
-              Object.entries(LIB_ENV).map(([key, text]) => (
+              Object.entries(LIB_ENV_CHOICES).map(([key, text]) => (
                 <Option key={key} value={key}>{text}</Option>
               ))
             }
@@ -187,7 +188,7 @@ const CreateToollibs = (props: CreateToollibsProps) => {
           label="依赖仓库地址"
           name="scm_url"
           required
-          help={zipWarningVisible && <span style={{ color: '#eb333f' }}><AttentionIcon />请勿使用不明来源的文件链接，避免潜在的安全风险。</span>}
+          help={zipWarningVisible ? <span style={{ color: '#eb333f' }}><AttentionIcon />请勿使用不明来源的文件链接，避免潜在的安全风险。</span> : null}
         >
           <Input.Group compact>
             <Form.Item name='scm_type' noStyle>
@@ -202,6 +203,7 @@ const CreateToollibs = (props: CreateToollibsProps) => {
               noStyle
               rules={[
                 { required: true, message: '依赖仓库地址' },
+                !zipWarningVisible && formScmURLSecValidate(),
               ]}
             >
               <Input style={{ width: '84%' }} />
@@ -214,8 +216,7 @@ const CreateToollibs = (props: CreateToollibsProps) => {
           }
         >
           {({ getFieldValue }: { getFieldValue: any }) => (getFieldValue('scm_type') !== RepoTypeEnum.ZIP && (
-            <Authority
-              form={form}
+            <AuthFormItem form={form}
               name='scm'
               label={(
                 <span>
@@ -226,16 +227,11 @@ const CreateToollibs = (props: CreateToollibsProps) => {
                   ><QuestionCircle className={style.questionIcon} /></Tooltip>
                 </span>
               )}
-              getAuthList={[
-                UserAPI.authSSH().get,
-                UserAPI.authAccount().get,
-                UserAPI.getOAuthInfos,
-                UserAPI.getPlatformStatus,
-              ]}
-              initAuth={detail.scm_auth}
+              userAuthAPI={userAuthAPI}
+              authinfo={detail.scm_auth}
               selectStyle={{ width: 360 }}
               placeholder='github公开仓库可不提供凭证'
-            />
+              allowClear />
           ))}
         </Form.Item>
         <Form.Item

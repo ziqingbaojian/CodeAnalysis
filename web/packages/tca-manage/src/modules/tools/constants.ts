@@ -1,5 +1,5 @@
 import { SearchFormField } from '@tencent/micro-frontend-shared/tdesign-component/search';
-import { t } from '@tencent/micro-frontend-shared/i18n';
+import { t } from '@src/utils/i18n';
 import { generateOptions } from '@tencent/micro-frontend-shared/util';
 
 /** 工具运营状态 */
@@ -46,7 +46,7 @@ export const PERM_OPTIONS = generateOptions(PERM_CHOICES, true);
 
 /** 定义筛选字段结构 */
 export const TOOL_SEARCH_FIELDS: SearchFormField[] = [{
-  name: 'display_name',
+  name: 'fuzzy_name',
   label: '名称',
   formType: 'input',
   type: 'string',

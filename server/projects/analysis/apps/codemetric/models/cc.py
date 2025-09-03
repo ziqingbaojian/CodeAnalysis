@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -137,7 +137,7 @@ class CyclomaticComplexityFile(CDBaseModel):
 
 
 class CyclomaticComplexity(CDBaseModel):
-    """重复代码问题
+    """圈复杂度问题
     """
 
     class ChangeTypeEnum(object):

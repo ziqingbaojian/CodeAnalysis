@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -28,4 +28,4 @@ EDITION = Edition.OpenSource
 # 版本号
 # ========================
 # puppy版本号,格式：浮点数，整数部分为8位日期，小数部分为编号(从1开始)
-VERSION = 20220907.1
+VERSION = 20240716.1

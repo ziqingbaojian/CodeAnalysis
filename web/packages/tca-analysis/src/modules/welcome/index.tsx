@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { Button } from 'coding-oa-uikit';
 import PlusIcon from 'coding-oa-uikit/lib/icon/Plus';
 // 项目内
@@ -16,7 +16,6 @@ import s from './style.scss';
 
 const Welcome = () => {
   const history = useHistory();
-  const { t } = useTranslation();
   const { orgSid, teamName }: any = useParams();
 
   return (
@@ -34,7 +33,7 @@ const Welcome = () => {
         <Button
           type="primary"
           icon={<PlusIcon />}
-          onClick={() => history.push(`${getReposRouter(orgSid, teamName)}/create`)
+          onClick={() => history.push(`${getReposRouter(orgSid, teamName)}`)
           }
         >
           {t('登记代码库')}

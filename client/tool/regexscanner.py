@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -66,6 +66,21 @@ class RegexScanner(CodeLintModel):
                             break
         return config_rules_path
 
+    def __get_regexes_exp(self, regex_type, rule_params_dict):
+        """获取正则列表
+        """
+        regexes = []
+        i = 1
+        while True:
+            key = f"{regex_type}{i}"
+            if key in rule_params_dict:
+                reg_exp = rule_params_dict.get(key, "")
+                if reg_exp:
+                    regexes.append(reg_exp)
+                i += 1
+            else:
+                return regexes
+
     def __format_rules(self, work_dir, rule_list):
         """格式化规则
         """
@@ -74,7 +89,8 @@ class RegexScanner(CodeLintModel):
         for rule in rule_list:
             rule_name = rule['name']
             if not rule.get('params'):
-                logger.error(f"{rule_name}规则参数为空, 检查已存在的规则.")
+                logger.error(f"{rule_name} rule parameter is empty, check for existing rules.")
+                rules["rules"].append({"name":rule_name})
                 no_params_rules.append(rule_name)
                 continue
             if "[regexcheck]" in rule['params']:
@@ -83,10 +99,13 @@ class RegexScanner(CodeLintModel):
                 rule_params = "[regexcheck]\r\n" + rule['params']
             rule_params_dict = ConfigReader(cfg_string=rule_params).read('regexcheck')
 
-            reg_exp = rule_params_dict.get('regex', '')
-            if not reg_exp:
-                logger.error(f"{rule_name}规则参数有误,未填写正则表达式,跳过该规则.")
+            regex = rule_params_dict.get("regex", "")
+            regex_not = rule_params_dict.get("regex_not", "")
+            if not regex:
+                rules["rules"].append({"name":rule_name})
                 continue
+            regexes = self.__get_regexes_exp("regex", rule_params_dict)
+            regexes_not = self.__get_regexes_exp("regex_not", rule_params_dict)
 
             # 规则的过滤路径（正则表达式）
             exclude_paths = rule_params_dict.get('exclude', '')
@@ -97,17 +116,25 @@ class RegexScanner(CodeLintModel):
             # 大小写不敏感,可以支持True|true|False|false等
             ignore_comment = True if rule_params_dict.get('ignore_comment', 'False').lower() == 'true' else False
             file_scan = True if rule_params_dict.get('file_scan', 'False').lower() == 'true' else False
-            msg = rule_params_dict.get('msg', "发现不规范代码: %s")
-            rules["rules"].append({
+            msg = rule_params_dict.get('msg', "Irregular codes found: %s")
+            match_group = rule_params_dict.get('match_group', 0)
+            entropy = rule_params_dict.get('entropy', 0.0)
+            rule = {
                 "name": rule_name,
-                "regex": reg_exp,
+                "regex": regex,
+                "regexes": regexes,
+                "regex-not": regex_not,
+                "regexes-not": regexes_not,
+                "message": msg,
+                "ignore-comment": ignore_comment,
+                "filescan": file_scan,
+                "severity": "error",
                 "excludes": exclude_paths,
                 "includes": include_paths,
-                "message": msg,
-                "ignorecomment": ignore_comment,
-                "filescan": file_scan,
-                "severity": "error"
-            })
+                "match-group": match_group,
+                "entropy": entropy,
+            }
+            rules["rules"].append(rule)
         config_rules_path = self.__add_rules(work_dir, no_params_rules)
         rules_path = os.path.join(config_rules_path, "regexscanner_rules.yaml")
         with open(rules_path, "w", encoding="utf-8") as f:
@@ -129,18 +156,18 @@ class RegexScanner(CodeLintModel):
         files_path = os.path.join(work_dir, "regexscanner_paths.txt")
         output_path = os.path.join(work_dir, "regexscanner_result.json")
 
-        logger.info('获取需要分析的文件')
         toscans = []
         if incr_scan:
             diffs = SCMMgr(params).get_scm_diff()
-            toscans = [os.path.join(source_dir, diff.path) for diff in diffs if
-                       diff.path.lower().endswith(CODE_EXT) and diff.state != 'del']
+            toscans = [os.path.join(source_dir, diff.path) for diff in diffs if diff.state != 'del']
         else:
-            toscans = PathMgr().get_dir_files(source_dir, CODE_EXT)
+            toscans = PathMgr().get_dir_files(source_dir)
 
         # filter include and exclude path
         relpos = len(source_dir) + 1
         toscans = FilterPathUtil(params).get_include_files(toscans, relpos)
+
+        toscans = self.get_valid_encode_files(toscans)
 
         if not toscans:
             logger.debug("To-be-scanned files is empty ")
@@ -168,8 +195,8 @@ class RegexScanner(CodeLintModel):
         subproc.wait()
 
         if not os.path.exists(output_path):
-            logger.info("没有生成结果文件")
-            raise AnalyzeTaskError("工具执行错误")
+            logger.info("No results file generated.")
+            raise AnalyzeTaskError("Tool running error")
 
         issues = []
         with open(output_path, "r") as f:
@@ -181,8 +208,8 @@ class RegexScanner(CodeLintModel):
                 continue
             issue = dict()
             issue["path"] = item["path"]
-            issue["line"] = item["line"]
-            issue["column"] = item["column"]
+            issue["line"] = item.get("start-line") if "start-line" in item else item["line"]
+            issue["column"] = item.get("start-column") if "start-column" in item else item["column"]
             issue["msg"] = item["msg"]
             issue["rule"] = item["rule"]
             issue["refs"] = []
@@ -196,6 +223,20 @@ class RegexScanner(CodeLintModel):
         if settings.PLATFORMS[sys.platform] == "windows":
             tool_path = f"{tool_path}.exe"
         return __lu__().format_cmd(tool_path, args)
+
+    def get_valid_encode_files(self, toscans: list):
+        """
+        获取能正确解码的文件字符串
+        """
+        new_toscans = []
+        for path in toscans:
+            try:
+                path.encode(encoding="UTF-8")
+            except UnicodeEncodeError:
+                logger.info("ignore file: %s" % path)
+                continue
+            new_toscans.append(path)
+        return new_toscans
 
     def set_filter_type_list(self):
         '''

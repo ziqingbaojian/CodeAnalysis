@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { get } from 'lodash';
 import { Dialog, Form, Input, MessagePlugin, Select, Tag } from 'tdesign-react';
 
@@ -8,7 +8,7 @@ import { tagAPI } from '@src/services/nodes';
 
 // 模块内
 import { TAG_TYPE_OPTIONS, TagTypeEnum } from '@src/constant/node';
-import { ORG_STATE_CHOICES, OrgStateEnum } from '@plat/modules/orgs/constants';
+import { ORG_STATUS_CHOICES, OrgStatusEnum } from '@plat/modules/orgs/constants';
 import s from '@src/modules/nodes/style.scss';
 
 const { FormItem } = Form;
@@ -25,7 +25,6 @@ interface TagModalProps {
 const TagModal = ({ tagInfo, orgList, visible, onOk, onCancel }: TagModalProps) => {
   const formRef = useRef<any>(null);
   const [tagType, setTagType] = useState<number>();
-  const { t } = useTranslation();
 
   useEffect(() => {
     setTagType(tagInfo?.tag_type);
@@ -127,9 +126,9 @@ const TagModal = ({ tagInfo, orgList, visible, onOk, onCancel }: TagModalProps) 
               <Option key={item.org_sid} value={item.org_sid} label={item.name}>
                 <div className={s.orgOption}>
                   <span>{item.name}</span>
-                  {item.status === OrgStateEnum.ACTIVE
-                    ? <Tag size='small' className={s.activeOrg}>{ORG_STATE_CHOICES[OrgStateEnum.ACTIVE]}</Tag>
-                    : <Tag size='small' className={s.inactiveOrg}>{ORG_STATE_CHOICES[OrgStateEnum.INACTIVE]}</Tag>
+                  {item.status === OrgStatusEnum.ACTIVE
+                    ? <Tag size='small' className={s.activeOrg}>{ORG_STATUS_CHOICES[OrgStatusEnum.ACTIVE]}</Tag>
+                    : <Tag size='small' className={s.inactiveOrg}>{ORG_STATUS_CHOICES[OrgStatusEnum.FORBIDEN]}</Tag>
                   }
                 </div>
               </Option>

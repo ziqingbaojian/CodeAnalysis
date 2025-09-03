@@ -20,12 +20,7 @@
 - (2) 在命令行中执行安装脚本`install.sh`(linux/mac环境)或`install.bat`(windows环境)
 
 ### 4. 配置client/config.ini文件
--（1）将`<Server IP地址>`替换成实际的serve ip（可包含端口号）。
-
--（2）国内使用github拉取网络较慢，推荐使用腾讯工蜂拉取，需要修改以下配置：
-- 修改 `TOOL_CONFIG_URL`=`https://git.code.tencent.com/TCA/tca-tools/puppy-tools-config.git`
-- 前往[腾讯工蜂网站](https://git.code.tencent.com)注册账号，作为拉取工具使用（已经注册过的可以直接使用）
-- 将腾讯工蜂的账号密码填写到`TOOL_LOAD_ACCOUNT`中（由于腾讯工蜂的开源仓库也要求使用账号才能拉取，所以此处必须填写账号密码）
+- 将`<Server IP地址>`替换成实际的serve ip（可包含端口号）。
 
 ### 5. 配置client/codedog.ini文件（分布式节点模式无需配置）
 填写以下必填项：`token`,`org_sid`,`team_name`,`source_dir`
@@ -54,7 +49,9 @@
 参考Docker官方文档：[Docker下载和安装](https://docs.docker.com/get-started/)
 
 ### 2. 构建docker镜像
-在`client`目录下，执行以下命令：`docker build -t tca-client .`
+在`client`目录下，执行以下命令：
+- `docker build --build-arg TARGETARCH={ARCH} -t tca-client .`
+> 变量`{ARCH}`替换为需要构建的架构，可选值：amd64, arm64.
 
 ### 3. 执行docker容器，扫描代码，可选以下两种方式
 
@@ -117,4 +114,4 @@ python3 codepuppy.py localscan
 
 ### 3. git lfs带宽和存储配额不够问题
 - 优先考虑切换为腾讯工蜂源（参考基础配置第4点）
-- 如果git拉取工具时，出现git lfs拉取失败，可能是lfs带宽和存储配额不够，可以打开对应的工具github页面，通过`Download ZIP`的方式下载工具压缩包，再解压到`client/data/tools`目录下。
+- 如果git拉取工具时，出现git lfs拉取失败，可能是lfs带宽和存储配额不够，可以打开对应的工具github页面，通过`Download ZIP`的方式下载工具压缩包，再解压到`tools`目录下。

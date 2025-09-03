@@ -5,7 +5,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20200518</version>
+            <version>20231013</version>
         </dependency>
     </dependencies>
     <parent>
@@ -39,7 +39,7 @@
             <dependency>
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
-                <version>20160810</version>
+                <version>20231013</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -70,4 +70,7 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
+    <build>
+        <finalName>tca_jenkins_plugin</finalName>
+    </build>
 </project>

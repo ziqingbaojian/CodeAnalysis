@@ -30,6 +30,7 @@ export const en: SidebarConfig = {
             '/en/guide/代码检查/工具/TCA-Armory-R.md',
             '/en/guide/代码检查/工具/TCA-Armory-C1.md',
             '/en/guide/代码检查/工具/TCA-Armory-Q1.md',
+            '/en/guide/代码检查/工具/Error-Prone.md',
           ],
         },
         {
@@ -37,6 +38,10 @@ export const en: SidebarConfig = {
           children: [
             '/en/guide/代码检查/规则包/cpp_doc.md',
             '/en/guide/代码检查/规则包/enhanced_safety_java.md',
+            '/en/guide/代码检查/规则包/test_case_verify_go.md',
+            '/en/guide/代码检查/规则包/code_spec_oc.md',
+            '/en/guide/代码检查/规则包/front_end_framework_check.md',
+            '/en/guide/代码检查/规则包/dependency_vul.md',
           ],
         },
       ]
@@ -97,6 +102,12 @@ export const en: SidebarConfig = {
         '/en/guide/web/deploySource.md',
       ]
     },
+    {
+      text: '插件',
+      children: [
+        '/en/guide/插件/Jenkins_Plugin.md',
+      ]
+    },
   ],
   '/en/advanced/': [
     {
@@ -104,6 +115,7 @@ export const en: SidebarConfig = {
       children: [
         '/en/advanced/任务分布式执行.md',
         '/en/advanced/集成代码分析工具.md',
+        '/en/advanced/使用自建工具git库.md'
       ],
     },
     {

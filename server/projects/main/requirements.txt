@@ -1,53 +1,53 @@
 # Main Server Requirements
 # for server deploy
-gunicorn==20.1.0
+gunicorn==23.0.0
 
 # for django
-Django==3.1.14
+Django==3.2.25
 
 # for django using mysql server
-pymysql==1.0.2
+pymysql==1.1.1
 
 # for django template
 django-widget-tweaks==1.4.8
-Jinja2==2.11.3
+Jinja2==3.1.4
 markupsafe==2.0.1
 
 # for celery
 celery==5.2.3
 importlib-metadata==4.13.0
 django-celery-results==2.4.0
-redis==4.1.1
+redis==4.5.4
 celery-redbeat==2.0.0
 
 # for rest api
-djangorestframework==3.11.2
+djangorestframework==3.14.0
 coreapi==2.3.3
 Markdown==3.3.4
-Pygments==2.8.1
+Pygments==2.15.0
 django-filter==2.4.0
 django-cors-headers==3.7.0
 
 # for Document
-drf-yasg==1.17.1
+drf-yasg==1.21.5
 
 # for password
 pyaes==1.6.1
-pycryptodome==3.9.8
-cryptography==3.3.2
+pycryptodome==3.19.1
+cryptography==42.0.4
 rsa==4.7.2
 
 # for django permission
 django-guardian==2.3.0
 
 # for file upload and download
-urllib3==1.26.7
+urllib3==1.26.19
 
 # for database import and export module
 django-import-export==2.5.0
 
 # for exception log
-sentry-sdk==0.10.2
+sentry-sdk==2.8.0
 
 # for monitor
 django-prometheus==2.0.0

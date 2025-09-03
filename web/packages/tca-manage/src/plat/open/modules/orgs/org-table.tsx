@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { PaginationProps, Tag, Space, PrimaryTableCol, TableRowData, Divider } from 'tdesign-react';
 import Table from '@tencent/micro-frontend-shared/tdesign-component/table';
 import EllipsisTemplate from '@tencent/micro-frontend-shared/tdesign-component/ellipsis';
@@ -12,8 +12,8 @@ import s from '@src/modules/style.scss';
 
 // 模块内
 import {
-  OrgStateEnum,
-  ORG_STATE_CHOICES,
+  OrgStatusEnum,
+  ORG_STATUS_CHOICES,
 } from './constants';
 
 interface OrgTableProps {
@@ -26,7 +26,6 @@ interface OrgTableProps {
 
 const OrgTable = ({ dataSource, pagination, loading, onDelete, onRecover }: OrgTableProps) => {
   const history = useHistory();
-  const { t } = useTranslation();
 
   const columns: PrimaryTableCol<TableRowData>[] = [
     {
@@ -35,7 +34,7 @@ const OrgTable = ({ dataSource, pagination, loading, onDelete, onRecover }: OrgT
       width: 160,
       cell: ({ row }: any) => (
         <>
-          {row?.status === OrgStateEnum.ACTIVE
+          {row?.status === OrgStatusEnum.ACTIVE
             ? <a
               className='link-name text-weight-bold'
               href={`${getOrgRouter(row?.org_sid)}/${row?.repo_count !== 0 ? 'workspace' : 'projects'}`}
@@ -78,9 +77,9 @@ const OrgTable = ({ dataSource, pagination, loading, onDelete, onRecover }: OrgT
       title: t('状态'),
       width: 80,
       cell: ({ row }: any) => (
-        row?.status === OrgStateEnum.ACTIVE
-          ? <Tag theme='success' variant='light'>{ORG_STATE_CHOICES[OrgStateEnum.ACTIVE]}</Tag>
-          : <Tag theme='danger' variant='light'>{ORG_STATE_CHOICES[OrgStateEnum.INACTIVE]}</Tag>
+        row?.status === OrgStatusEnum.FORBIDEN
+          ? <Tag theme='danger' variant='light'>{ORG_STATUS_CHOICES[OrgStatusEnum.FORBIDEN]}</Tag>
+          : <Tag theme='success' variant='light'>{ORG_STATUS_CHOICES[OrgStatusEnum.ACTIVE]}</Tag>
       ),
     },
     {
@@ -98,13 +97,11 @@ const OrgTable = ({ dataSource, pagination, loading, onDelete, onRecover }: OrgT
             >
               {t('查看项目')}
             </a>
-            {row?.status === OrgStateEnum.ACTIVE
-              && <a onClick={() => onDelete(row)} className={s.deleteOp}>
-                {t('禁用团队')}
-              </a>}
-            {row?.status === OrgStateEnum.INACTIVE
-              && <a onClick={() => onRecover(row)}>
+            {row?.status === OrgStatusEnum.FORBIDEN
+              ? <a onClick={() => onRecover(row)}>
                 {t('恢复团队')}
+              </a> : <a onClick={() => onDelete(row)} className={s.deleteOp}>
+                {t('禁用团队')}
               </a>}
           </Space>
         </>

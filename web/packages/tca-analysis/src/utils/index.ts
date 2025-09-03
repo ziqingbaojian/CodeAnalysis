@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -7,10 +7,8 @@
 import Moment from 'moment';
 import qs from 'qs';
 import { message } from 'coding-oa-uikit';
-import { get, uniqBy, throttle } from 'lodash';
-import { LOGIN_SERVER_API } from '@src/services/common';
-import { useStateStore } from '@src/context/store';
-
+import { get, throttle } from 'lodash';
+import { LOGIN_SERVER_API } from '@src/constant/api';
 
 /**
  * 格式化时间，默认返回时间的年月日
@@ -62,16 +60,6 @@ export const getUserName = (user: any) => {
 export const getQuery = () => qs.parse(window.location.search.replace('?', ''));
 
 /**
- * 获取项目成员
- */
-export const getProjectMembers = () => {
-  const { projectMembers } = useStateStore();
-  const { admins, users } = projectMembers;
-
-  return uniqBy([...admins, ...users], 'username');
-};
-
-/**
  * 获取meta标签content
  * @param key
  * @param defaultValue
@@ -84,8 +72,8 @@ export const getRuntimeEnv = (key: string, defaultValue = '') => {
 /**
  * 重新登录，节流
  */
-export const reLogin = throttle((content: string) => {
-  message.warning(content);
+export const reLogin = throttle((content?: string) => {
+  content && message.warning(content);
   const timer = setTimeout(() => {
     window.location.href = `/login?redirect_uri=${encodeURIComponent(window.location.href)}`;
     clearTimeout(timer);

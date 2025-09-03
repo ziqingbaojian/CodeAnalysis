@@ -1,10 +1,10 @@
 import { SearchFormField } from '@tencent/micro-frontend-shared/component/search';
-import { t } from '@tencent/micro-frontend-shared/i18n';
+import { t } from '@src/utils/i18n';
 import { TOOL_STATUS_OPTIONS, ToolScopeEnum } from '@src/constant';
 
 /** 定义筛选字段结构 */
 export const TOOL_SEARCH_FIELDS: SearchFormField[] = [{
-  name: 'display_name',
+  name: 'fuzzy_name',
   type: 'string',
   formType: 'input',
   placeholder: t('工具名称'),
@@ -17,9 +17,12 @@ export const TOOL_SEARCH_FIELDS: SearchFormField[] = [{
 }, {
   name: 'scope',
   type: 'number',
-  formType: 'checkbox',
-  formValue: ToolScopeEnum.CUSTOM,
-  placeholder: t('仅查看自定义工具'),
+  formType: 'select',
+  label: t('工具类型'),
+  options: [{
+    label: '自定义',
+    value: ToolScopeEnum.CUSTOM,
+  }],
 }];
 
 /** 高级搜索的筛选字段 */

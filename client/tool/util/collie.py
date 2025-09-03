@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -74,7 +74,8 @@ class Collie(object):
             psutil.Process(pid)
             ProcMgr().kill_proc_famliy(pid)
         except psutil.NoSuchProcess as e:
-            logger.exception("exception: %s", str(e))
+            # logger.exception("exception: %s", str(e))
+            pass
 
     def scan(self, files=None, want_suffix=None, force_all=False):
         """

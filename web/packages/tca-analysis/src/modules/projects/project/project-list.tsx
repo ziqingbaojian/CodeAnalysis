@@ -1,30 +1,30 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
 // ==============================================================================
 
 /**
- * description      分支项目列表
+ * description      分析项目列表
  */
 
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { Table, Button, Input, message } from 'coding-oa-uikit';
-import { pickBy, isNumber, get, toNumber, find } from 'lodash';
+import { pickBy, isNumber, get, toNumber, isEmpty } from 'lodash';
 import qs from 'qs';
-import { useSelector } from 'react-redux';
 
+import { useLoginUserIsAdmin } from '@plat/hooks';
 import SelectDropdown from '../../../components/select-dropdown';
 import Tips from '@src/components/tips';
 import { useStateStore } from '@src/context/store';
 import { DEFAULT_PAGER } from '@src/constant';
 import { useQuery } from '@src/utils/hooks';
-import { getProjectRouter, getSchemeRouter } from '@src/utils/getRoutePath';
+import { getProjectRouter, getSchemeBlankRouter } from '@src/utils/getRoutePath';
 import { getProjects, delProject } from '@src/services/projects';
-import { getMembers } from '@src/services/common';
+import { getRepoMembers } from '@src/services/repos';
 
-import ScanModal from './scan-modal';
+import ScanModal from '@plat/modules/projects/scan-modal';
 import NewProjectModal from './new-project-modal';
 import DeleteModal from '@src/components/delete-modal';
 
@@ -54,14 +54,6 @@ const ProjectList = (props: ProjectListProps) => {
   const [curProjId, setCurProjId] = useState<number>(null);
   const [reload, setReload] = useState<boolean>(false);
   const [hoverRowId, setHoverRowId] = useState(undefined);
-
-  // 判断是否有权限删除分支项目
-  const APP = useSelector((state: any) => state.APP);
-  const isSuperuser = get(APP, 'user.is_superuser', false); // 当前用户是否是超级管理员
-  const userName = get(APP, 'user.username', null);
-  const [admins, setAdmins] = useState<any>([]);
-  const isAdmin = !!find(admins, { username: userName }); // 当前用户是否是代码库管理员
-  const deletable = isAdmin || isSuperuser; // 删除权限
   const [deleteVisible, setDeleteVisible] = useState<boolean>(false);
 
   const [searchParams, setSearchParams] = useState({
@@ -70,6 +62,16 @@ const ProjectList = (props: ProjectListProps) => {
   });
 
   const { pageSize, pageStart, count } = pager;
+  const [admins, setAdmins] = useState<any>([]);
+  const isAdmin = useLoginUserIsAdmin(admins);
+
+  useEffect(() => {
+    if (!isEmpty(schemes) && schemes[0]?.repo === toNumber(repoId)) {
+      // 分析方案不为空，则表示不会打开【开启第一次代码分析弹框】
+      // 为避免同时打开两个弹框，需先判断分析方案是否为空
+      getListData(pageSize, pageStart, true);
+    }
+  }, [schemes]);
 
   useEffect(() => {
     repoId && getListData();
@@ -85,8 +87,8 @@ const ProjectList = (props: ProjectListProps) => {
   useEffect(() => {
     // 获取代码库成员
     if (repoId) {
-      getMembers(orgSid, teamName, repoId).then((response) => {
-        setAdmins(response.admins);
+      getRepoMembers(orgSid, teamName, repoId).then((res: any) => {
+        setAdmins(res.admins?.map((userinfo: any) => userinfo.username) || []);
       });
     }
   }, [repoId]);
@@ -94,22 +96,29 @@ const ProjectList = (props: ProjectListProps) => {
   const getListData = (
     limit: number = pageSize,
     offset: number = pageStart,
+    modal = false,
   ) => {
+    const otherParams = pickBy(
+      searchParams,
+      (value, key) => isNumber(value) || (key === 'branch_or_scheme' && value),
+    );
     const params = {
       limit,
       offset,
-      ...pickBy(
-        searchParams,
-        (value, key) => isNumber(value) || (key === 'branch_or_scheme' && value),
-      ),
+      ...otherParams,
     };
     getProjects(orgSid, teamName, repoId, {
       ...params,
       scan_scheme__status: 1,
-    }).then((response) => {
-      history.push(`${location.pathname}?${qs.stringify(params)}`);
+    }).then((response: any) => {
+      history.replace(`${location.pathname}?${qs.stringify(params)}`);
       setList(response.results);
       setPager({ ...pager, count: response.count });
+
+      // 分析项目为空，且分析方案不为空时默认打开创建分支项目弹框，排除搜索导致list为空的情况
+      if (modal && isEmpty(otherParams) && response.count === 0) {
+        setCreateProjectVsb(true);
+      }
     });
   };
 
@@ -137,7 +146,7 @@ const ProjectList = (props: ProjectListProps) => {
   const handleDeleteProject = () => {
     delProject(orgSid, teamName, repoId, curProjId)
       .then(() => {
-        message.success('已删除分支项目');
+        message.success('已删除分析项目');
         setReload(!reload);
       })
       .finally(() => {
@@ -151,8 +160,8 @@ const ProjectList = (props: ProjectListProps) => {
       <div className={style.projectSearch}>
         <div>
           <h4 className={style.title}>
-            分支项目列表
-            <Tips title="分支项目 = 分支 + 分析方案" />
+            分析项目列表
+            <Tips title="分析项目 = 分支 + 分析方案" />
           </h4>
           <SelectDropdown
             allowClear
@@ -182,7 +191,7 @@ const ProjectList = (props: ProjectListProps) => {
           />
         </div>
         <Button type="primary" onClick={() => setCreateProjectVsb(true)}>
-          添加分支项目
+          添加分析项目
         </Button>
       </div>
       <div className={style.projectContent}>
@@ -229,21 +238,24 @@ const ProjectList = (props: ProjectListProps) => {
             title="分析方案"
             dataIndex={['scan_scheme', 'name']}
             render={(name, data: any) => (
-              <Link
+              <a
                 className={style.linkName}
                 target="_blank"
-                to={`${getSchemeRouter(
+                href={`${getSchemeBlankRouter(
                   orgSid,
                   teamName,
                   repoId,
                   get(data, 'scan_scheme.id'),
-                )}`}
+                )}`} rel="noreferrer"
               >
                 {name}
-              </Link>
+              </a>
             )}
           />
-
+          <Column
+            title="代码目录"
+            dataIndex='scan_path'
+          />
           <Column
             title="操作"
             dataIndex="id"
@@ -282,7 +294,7 @@ const ProjectList = (props: ProjectListProps) => {
                 >
                   分析历史
                 </Link>
-                {hoverRowId === id && deletable && (
+                {hoverRowId === id && isAdmin && (
                   <a
                     style={{ color: 'red' }}
                     onClick={() => onDeleteProject(id)}
@@ -318,7 +330,7 @@ const ProjectList = (props: ProjectListProps) => {
       />
       <DeleteModal
         actionType="删除"
-        objectType="分支项目"
+        objectType="分析项目"
         confirmName={`${curProjId}`}
         visible={deleteVisible}
         onCancel={() => setDeleteVisible(false)}

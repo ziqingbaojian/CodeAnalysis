@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { get } from 'lodash';
 import { Dialog, Form, Input, Select, Tooltip, Textarea, FormInstanceFunctions, InputAdornment } from 'tdesign-react';
 import { HelpCircleIcon } from 'tdesign-icons-react';
@@ -31,7 +31,6 @@ interface OAuthModalProps {
 
 const OAuthModal = ({ scminfo, visible, onCancel, onOk }: OAuthModalProps) => {
   const formRef = useRef<FormInstanceFunctions>(null);
-  const { t } = useTranslation();
 
   /** 表单保存操作 */
   const onSubmitHandle = () => {
@@ -103,8 +102,8 @@ const OAuthModal = ({ scminfo, visible, onCancel, onOk }: OAuthModalProps) => {
           initialData={getHostName(scminfo?.redirect_uri)}
         >
           <InputAdornment style={{ width: '100%' }}
-            prepend={<div style={{ width: 46 }}>http://</div>}
-            append={<div style={{ width: 150 }}>/cb_git_auth/{scminfo?.scm_platform_name}</div>}>
+            prepend='http://'
+            append={`/cb_git_auth/${scminfo?.scm_platform_name}`}>
             <Input placeholder="部署机IP" />
           </InputAdornment>
         </FormItem>

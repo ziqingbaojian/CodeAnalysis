@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -66,6 +66,23 @@ class ProjectCreateApiView(APIView):
         except IntegrityError as err:
             logger.error("create project exception: %s" % err)
             return Response(data={"msg": "project %s has exist" % project_id}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProjectDetailApiView(generics.DestroyAPIView):
+    """软删除项目
+    使用对象：服务内部
+
+    ### Delete
+    应用场景：在analysis服务中，软删除main服务已被删除且过期的project
+
+    """
+
+    schema = None
+    serializer_class = serializers.ProjectSerializer
+    authentication_classes = (MainServerInternalAuthentication,)
+
+    def get_object(self):
+        return get_object_or_404(models.Project, id=self.kwargs["project_id"])
 
 
 class ProjectScanListCreateApiView(generics.ListCreateAPIView, ProjectBaseAPIView):

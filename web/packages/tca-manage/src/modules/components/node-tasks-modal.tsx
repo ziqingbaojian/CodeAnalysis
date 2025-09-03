@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Table, Dialog, PageInfo, Tag } from 'tdesign-react';
 import { get } from 'lodash';
 
 // 项目内
-import { t } from '@tencent/micro-frontend-shared/i18n';
+import { t } from '@src/utils/i18n';
 import { getNodeTask } from '@src/services/nodes';
 import { STATE_CHOICES } from '@src/modules/jobs/constants';
 import EllipsisTemplate from '@tencent/micro-frontend-shared/tdesign-component/ellipsis';
+import { getJobRouter } from '@plat/util';
 
 export const DEFAULT_PAGER = {
   count: 0,
@@ -26,13 +28,7 @@ const NodeTaskModal = ({ visible, nodeId, onCancel }: NodeTaskModalProps) => {
   const [pager, setPager] = useState<any>(DEFAULT_PAGER);
   const { count, pageSize, currentPage } = pager;
 
-  useEffect(() => {
-    if (visible && nodeId) {
-      getTaskList(DEFAULT_PAGER.currentPage, DEFAULT_PAGER.pageSize);
-    }
-  }, [nodeId]);
-
-  const getTaskList = (page: number, pageSize: number) => {
+  const getTaskList = useCallback((page: number, pageSize: number) => {
     setLoading(true);
     getNodeTask(nodeId, {
       limit: pageSize,
@@ -46,7 +42,13 @@ const NodeTaskModal = ({ visible, nodeId, onCancel }: NodeTaskModalProps) => {
       });
       setLoading(false);
     });
-  };
+  }, [nodeId]);
+
+  useEffect(() => {
+    if (visible && nodeId) {
+      getTaskList(DEFAULT_PAGER.currentPage, DEFAULT_PAGER.pageSize);
+    }
+  }, [nodeId, visible, getTaskList]);
 
   const onChangePage = ({ current, pageSize }: PageInfo) => {
     setLoading(true);
@@ -59,9 +61,11 @@ const NodeTaskModal = ({ visible, nodeId, onCancel }: NodeTaskModalProps) => {
       title: t('分析任务'),
       width: 300,
       cell: ({ row }: any) => (<>
-        <EllipsisTemplate maxWidth={300} className="text-weight-bold">
-          {get(row, ['project', 'scm_url'])}
-        </EllipsisTemplate>
+        <Link to={getJobRouter(row)}>
+          <EllipsisTemplate maxWidth={300} className="text-weight-bold">
+            {get(row, ['project', 'scm_url'])}
+          </EllipsisTemplate>
+        </Link>
         <div className="mt-sm fs-12 text-grey-6">
           分支：{get(row, ['project', 'branch'])}
         </div>

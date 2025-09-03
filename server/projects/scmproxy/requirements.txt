@@ -1,7 +1,7 @@
-urllib3==1.26.7
+urllib3==1.26.19
 
 psutil==5.8.0
 
-sentry-sdk==0.19.4
+sentry-sdk==2.8.0
 
 pytz==2019.3

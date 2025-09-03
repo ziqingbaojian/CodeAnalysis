@@ -1,4 +1,5 @@
 declare module '*.scss';
+declare module '*.png';
 type Store = import('redux').Store;
 type Reducer = import('redux').Reducer;
 
@@ -51,4 +52,13 @@ interface WindowMicroHook {
 
 interface Window {
   microHook: WindowMicroHook;
+}
+
+
+// drf restful list api
+interface RestfulListAPIParams {
+  results: any[];
+  count: number;
+  next: string;
+  previous: string
 }

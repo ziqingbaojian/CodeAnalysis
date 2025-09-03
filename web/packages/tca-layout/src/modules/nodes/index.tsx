@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { filter } from 'lodash';
 import { Tabs } from 'coding-oa-uikit';
 
@@ -8,13 +8,14 @@ import { Tabs } from 'coding-oa-uikit';
 import { getTags } from '@src/services/nodes';
 
 // 模块内
-import NodeTable from './node-table';
-import TagTable from './tag-table';
+// import NodeTable from './node-table';
+// import TagTable from './tag-table';
+import NodeTable from '@plat/modules/nodes/node-table';
+import TagTable from '@plat/modules/nodes/tag-table';
 
 const { TabPane } = Tabs;
 
 const Nodes = () => {
-  const { t } = useTranslation();
   const [tags, setTags] = useState([]);
   const { orgSid }: any = useParams();
   const tagOptions = useMemo(() => tags.map((item: any) => ({
@@ -37,7 +38,9 @@ const Nodes = () => {
       <div className="px-lg">
         <Tabs defaultActiveKey="nodes" size="large">
           <TabPane tab={t('节点列表')} key="nodes">
-            <NodeTable tagOptions={tagOptions}/>
+            <NodeTable tagOptions={tagOptions} reloadTag={() => {
+              getData();
+            }}/>
           </TabPane>
           <TabPane tab={t('标签列表')} key="tags">
             <TagTable tags={tags} reload={() => {

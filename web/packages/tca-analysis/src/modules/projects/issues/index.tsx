@@ -1,11 +1,11 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
 // ==============================================================================
 
 /**
- * 分支项目 - 问题列表
+ * 分析项目 - 问题列表
  */
 import React, { useState, useEffect } from 'react';
 import cn from 'classnames';
@@ -18,7 +18,8 @@ import { isEmpty, omit, toNumber, omitBy, cloneDeep, find, isString, invert, fin
 import { Table, Avatar, message, Button, Modal, Tooltip, Tag, Input, Form } from 'coding-oa-uikit';
 import UserIcon from 'coding-oa-uikit/lib/icon/User';
 
-import { getQuery, getProjectMembers } from '@src/utils';
+import { getQuery } from '@src/utils';
+import { useProjectMembers } from '@src/utils/hooks';
 import Copy from '@src/components/copy';
 import { DEFAULT_PAGER } from '@src/constant';
 // import { getProjectRouter } from '@src/utils/getRoutePath';
@@ -80,7 +81,7 @@ const Issues = (props: IssuesProps) => {
     key: ordering.replace('-', ''),
     order: ordering.includes('-') ? 'descend' : 'ascend',
   };
-  const members = getProjectMembers();
+  const members = useProjectMembers();
 
   const searchParams: any = omit(query, ['offset', 'limit']);
 
@@ -118,7 +119,7 @@ const Issues = (props: IssuesProps) => {
       .then((response: any) => {
         callback?.(response.results || []);
         setCount(response.count);
-        history.push(`${location.pathname}?${qs.stringify(params)}`);
+        history.replace(`${location.pathname}?${qs.stringify(params)}`);
         setData({
           list: response.results || [],
           next: response.next,
@@ -361,16 +362,16 @@ const Issues = (props: IssuesProps) => {
             sortOrder={sort.key === 'checkrule_real_name' ? sort.order : undefined}
             render={(name: any, item: any) => (
               <>
-              <p>{name}</p>
-              {
-                item.msg && item.msg?.length > 120
-                  ? (
-                    <Tooltip title={item.msg}>
-                      <p className={style.path}>错误信息：{item?.msg?.substring(0, 120)}...</p>
-                    </Tooltip>
-                  ) : <p className={style.path}>错误信息：{item.msg}</p>
-              }
-            </>
+                <p>{name}</p>
+                {
+                  item.msg && item.msg?.length > 120
+                    ? (
+                      <Tooltip title={item.msg}>
+                        <p className={style.path}>错误信息：{item?.msg?.substring(0, 120)}...</p>
+                      </Tooltip>
+                    ) : <p className={style.path}>错误信息：{item.msg}</p>
+                }
+              </>
             )}
           />
           <Column

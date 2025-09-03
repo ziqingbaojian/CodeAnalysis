@@ -1,14 +1,16 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Modal, Form, Input, Checkbox, Select, message } from 'coding-oa-uikit';
+import { t } from '@src/utils/i18n';
+import { Form, Input, Checkbox, Select, message } from 'coding-oa-uikit';
+import { Alert, Dialog } from 'tdesign-react';
 
 // 项目内
 import { createTool } from '@src/services/tools';
 import { getToolsRouter } from '@src/utils/getRoutePath';
 import { RepoTypeEnum, REPO_TYPE_OPTIONS, AuthTypeEnum, SCM_MAP } from '@src/constant';
-import Authority from '@tencent/micro-frontend-shared/component/authority';
-import { UserAPI } from '@plat/api';
+import AuthFormItem from '@tencent/micro-frontend-shared/tca/user-auth/auth-form-item';
+import { formScmURLSecValidate } from '@tencent/micro-frontend-shared/util';
+import { userAuthAPI } from '@plat/api';
 
 const { TextArea } = Input;
 
@@ -26,7 +28,6 @@ interface CreateToolModalProps {
 const CreateToolModal = ({ orgId, visible, onClose }: CreateToolModalProps) => {
   const [form] = Form.useForm();
   const history = useHistory();
-  const { t } = useTranslation();
 
   /** 创建工具 */
   const onFinish = (data: any) => {
@@ -47,17 +48,21 @@ const CreateToolModal = ({ orgId, visible, onClose }: CreateToolModalProps) => {
   };
 
   return (
-    <Modal
-      title={t('创建工具')}
+    <Dialog
+      top={40}
+      header={t('创建工具')}
       width={600}
       visible={visible}
-      // okButtonProps={{ loading }}
-      afterClose={form.resetFields}
-      onCancel={onClose}
-      onOk={() => {
+      onClosed={form.resetFields}
+      onClose={onClose}
+      onConfirm={() => {
         form.validateFields().then(onFinish);
       }}
     >
+      <Alert className='tca-mb-md' theme="error"
+        title="扩展集成工具免责声明"
+        message="被扩展集成进腾讯云代码分析系统的任何非官方工具，该类工具对于腾讯云代码分析系统等于黑盒，腾讯云代码分析系统不对该类工具负责，由该类工具方承担所有责任（包括但不限于分发被分析代码，产生代码以及相关信息泄漏）。"
+      />
       <Form {...layout} form={form} initialValues={{ scm_type: RepoTypeEnum.GIT }}>
         <Form.Item
           label={t('工具名称')}
@@ -100,25 +105,21 @@ const CreateToolModal = ({ orgId, visible, onClose }: CreateToolModalProps) => {
               noStyle
               rules={[
                 { required: true, message: t('请输入工具仓库地址') },
+                formScmURLSecValidate,
               ]}
             >
               <Input style={{ width: '84%' }} />
             </Form.Item>
           </Input.Group>
         </Form.Item>
-        <Authority
+        <AuthFormItem
           form={form}
           name='scm_auth_id'
           label={t('凭证')}
-          getAuthList={[
-            UserAPI.authSSH().get,
-            UserAPI.authAccount().get,
-            UserAPI.getOAuthInfos,
-            UserAPI.getPlatformStatus,
-          ]}
+          userAuthAPI={userAuthAPI}
           selectStyle={{ width: 360 }}
           required
-        />
+          allowClear />
         <Form.Item
           label={t('执行命令')}
           name='run_cmd'
@@ -139,7 +140,7 @@ const CreateToolModal = ({ orgId, visible, onClose }: CreateToolModalProps) => {
           <Checkbox>{t('是否为编译型工具')}</Checkbox>
         </Form.Item>
       </Form>
-    </Modal>
+    </Dialog>
   );
 };
 

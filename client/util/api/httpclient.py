@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -8,6 +8,7 @@
 """ http client
 """
 
+import ssl
 import json
 import logging
 
@@ -40,7 +41,7 @@ class HttpRequest(object):
         try:
             request = Request(url=url, data=body, headers=headers)
             request.get_method = lambda: method.upper()
-            response = urlopen(request)
+            response = urlopen(request, context=ssl._create_unverified_context())
             return response
         except HTTPError as err:
             error_msg = err.read().decode('utf-8')
@@ -80,6 +81,10 @@ class HttpClient(object):
 
     def put(self):
         response = HttpRequest.request(url=self.url, headers=self.headers, body=self.data, method="PUT")
+        return response
+
+    def head(self):
+        response = HttpRequest.request(url=self.url, headers=self.headers, body=self.data, method="HEAD")
         return response
 
 

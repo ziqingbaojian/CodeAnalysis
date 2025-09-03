@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -36,8 +36,11 @@ class JobHeartBeatThread(threading.Thread):
 
     def run(self):
         while self._event.is_set():
+            try:
+                self._server.job_heart_beat(self._org_sid, self._team_name, self._repo_id, self._project_id, self._job_id)
+            except Exception as err:
+                logger.exception(f"job heartbeat error: {str(err)}")
             time.sleep(self._sleep_interval)
-            self._server.job_heart_beat(self._org_sid, self._team_name, self._repo_id, self._project_id, self._job_id)
 
 
 class JobHeartBeat(object):

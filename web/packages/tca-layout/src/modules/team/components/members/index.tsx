@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import copy2Clipboard from 'copy-to-clipboard';
 import { get } from 'lodash';
 import { Input, Button, Modal, Row, Col, message, Tag } from 'coding-oa-uikit';
@@ -8,6 +8,7 @@ import PlusCircleIcon from 'coding-oa-uikit/lib/icon/PlusCircle';
 import CloseCircleIcon from 'coding-oa-uikit/lib/icon/CloseCircle';
 import { DangerModal } from '@tencent/micro-frontend-shared/component/modal';
 import UserAvatar from '@tencent/micro-frontend-shared/component/user-avatar';
+import PageHeader from '@tencent/micro-frontend-shared/tdesign-component/page-header';
 
 import { OrgMemberRoleEnum, ORG_MEMBER_ROLE_INFO } from '@src/constant';
 import { getTeamMember, getInviteCode, removeMember } from '@src/services/team';
@@ -22,7 +23,6 @@ interface MemberItemProps {
 }
 
 const MemberItem = ({ list, role, onAddMemberClick, onRemoveMemberClick }: MemberItemProps) => {
-  const { t } = useTranslation();
   const { tit, desc }: any = get(ORG_MEMBER_ROLE_INFO, role, {});
   return (
     <div className={style.memberItem}>
@@ -72,7 +72,6 @@ const Members = () => {
   const [removeUser, setRemoveUser] = useState<any>(null);
 
   const { orgSid }: any = useParams();
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (orgSid) {
@@ -85,7 +84,7 @@ const Members = () => {
   /** 邀请成员，生成邀请链接 */
   const onAddMemberHandle = (role: number) => {
     getInviteCode(orgSid, { role }).then(({ invite_code: inviteCode }) => {
-      const inviUrl = `${window.location.origin}/t/invite/${encodeURIComponent(inviteCode)}`;
+      const inviUrl = `${window.location.origin}/invite/${encodeURIComponent(inviteCode)}`;
       setInviteUrl(inviUrl);
       setInviteVisb(true);
     });
@@ -119,62 +118,62 @@ const Members = () => {
   };
 
   return (
-    <div className="pa-lg">
-      <div className="mb-lg">
-        <h3>{t('团队成员管理')}</h3>
-      </div>
-      <Modal
-        title={t('邀请成员')}
-        visible={inviteVisb}
-        onOk={onCopyURLHandle}
-        okText={t('复制链接')}
-        onCancel={() => setInviteVisb(false)}
-      >
-        <Input disabled value={inviteUrl} />
-        <div className="fs-12 pt-sm text-grey-6">
-          * 分享链接，邀请成员，十分钟内有效
-        </div>
-      </Modal>
-      <DangerModal
-        title={t('移除用户')}
-        visible={removeVisb}
-        onCancel={() => {
-          setRemoveVisb(false);
-          setRemoveUser(null);
-        }}
-        onOk={() => {
-          if (removeUser) {
-            onRemoveMemberRequest(removeUser.role, removeUser.userinfo);
+    <>
+      <PageHeader title="团队成员管理" description="团队成员数据，团队管理员可邀请成员" />
+      <div className="pa-lg">
+        <Modal
+          title={t('邀请成员')}
+          visible={inviteVisb}
+          onOk={onCopyURLHandle}
+          okText={t('复制链接')}
+          onCancel={() => setInviteVisb(false)}
+        >
+          <Input disabled value={inviteUrl} />
+          <div className="fs-12 pt-sm text-grey-6">
+            * 分享链接，邀请成员，十分钟内有效
+          </div>
+        </Modal>
+        <DangerModal
+          title={t('移除用户')}
+          visible={removeVisb}
+          onCancel={() => {
+            setRemoveVisb(false);
+            setRemoveUser(null);
+          }}
+          onOk={() => {
+            if (removeUser) {
+              onRemoveMemberRequest(removeUser.role, removeUser.userinfo);
+            }
+          }}
+          content={
+            removeUser ? (
+              <div>
+                确定移除{' '}
+                <Tag color="default">
+                  <b>
+                    {get(ORG_MEMBER_ROLE_INFO, `${removeUser.role}.tit`, ' ')}
+                    {getNickName(removeUser.userinfo)}
+                  </b>
+                </Tag>{' '}
+                {t('？')}
+              </div>
+            ) : <></>
           }
-        }}
-        content={
-          removeUser ? (
-            <div>
-              确定移除{' '}
-              <Tag color="default">
-                <b>
-                  {get(ORG_MEMBER_ROLE_INFO, `${removeUser.role}.tit`, ' ')}
-                  {getNickName(removeUser.userinfo)}
-                </b>
-              </Tag>{' '}
-              {t('？')}
-            </div>
-          ) : <></>
-        }
-      />
-      <MemberItem
-        list={members.admins}
-        role={OrgMemberRoleEnum.ADMIN}
-        onAddMemberClick={onAddMemberHandle}
-        onRemoveMemberClick={onRemoveMemberHandle}
-      />
-      <MemberItem
-        list={members.users}
-        role={OrgMemberRoleEnum.USER}
-        onAddMemberClick={onAddMemberHandle}
-        onRemoveMemberClick={onRemoveMemberHandle}
-      />
-    </div>
+        />
+        <MemberItem
+          list={members.admins}
+          role={OrgMemberRoleEnum.ADMIN}
+          onAddMemberClick={onAddMemberHandle}
+          onRemoveMemberClick={onRemoveMemberHandle}
+        />
+        <MemberItem
+          list={members.users}
+          role={OrgMemberRoleEnum.USER}
+          onAddMemberClick={onAddMemberHandle}
+          onRemoveMemberClick={onRemoveMemberHandle}
+        />
+      </div>
+    </>
   );
 };
 

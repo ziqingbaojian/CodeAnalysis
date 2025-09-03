@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -24,7 +24,7 @@ from util.logutil import LogPrinter
 from util.pathlib import PathMgr
 from task.scmmgr import SCMMgr
 from util.subprocc import SubProcController
-
+from util.exceptions import AnalyzeTaskError
 
 class Tscan(CodeLintModel):
     def analyze(self, params, tc_home, bin_name, want_suffix):
@@ -60,13 +60,16 @@ class Tscan(CodeLintModel):
                 stdout_line_callback=subprocc_log,
             )
             sp.wait()
-            if os.path.exists(output_file):
+            if os.path.exists(output_file) and os.stat(output_file).st_size != 0:
                 issues.extend(self._format_issue(output_file))
         return issues
 
     def _format_issue(self, output_file):
         issues = []
-        result_tree = ET.parse(output_file)
+        try:
+            result_tree = ET.parse(output_file)
+        except ET.ParseError:
+            raise AnalyzeTaskError("源文件编码格式错误，建议启用WrongEncoding规则检测源文件编码格式")
         root = result_tree.getroot()
         for error in root:
             error_attr = error.attrib

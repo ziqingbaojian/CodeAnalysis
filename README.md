@@ -6,23 +6,27 @@
     <em>code-named: CodeDog</em>
 </p>
 
-[![license](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat)](LICENSE) [![docs](https://img.shields.io/badge/docs-read-brightgreen.svg?style=flat)](https://tencent.github.io/CodeAnalysis/)
+[![license](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat)](LICENSE.txt) [![docs](https://img.shields.io/badge/docs-read-brightgreen.svg?style=flat)](https://tencent.github.io/CodeAnalysis/)
 
-English | [简体中文](README_ZH.md)
+[English](README.md) | [简体中文](README_ZH.md)
 
-## TCA Official Website
+## TCA Official
 
-[https://cloud.tencent.com/product/tcap](https://cloud.tencent.com/product/tcap)
+[Official website: https://tca.tencent.com](https://tca.tencent.com)
+
+[Official introduction: https://cloud.tencent.com/product/tcap](https://cloud.tencent.com/product/tcap)
+
+## TCA CNB Pages(Better Internet Speed)
+
+[Domestic: https://cnb.cool/tencent/cloud/tca/code-analysis](https://cnb.cool/tencent/cloud/tca/code-analysis)
+
+[Domestic: https://cnb.cool/tencent/cloud/tca](https://cnb.cool/tencent/cloud/tca)
 
 ## TCA Github Pages
 
-[https://tencent.github.io/CodeAnalysis/](https://tencent.github.io/CodeAnalysis/)
+[Overseas: https://tencent.github.io/CodeAnalysis/](https://tencent.github.io/CodeAnalysis/)
 
-[https://github.com/TCATools](https://github.com/TCATools)
-
-## Repo Mirror
-
-[https://git.code.tencent.com/Tencent_Open_Source/CodeAnalysis.git](https://git.code.tencent.com/Tencent_Open_Source/CodeAnalysis.git)
+[Overseas: https://github.com/TCATools](https://github.com/TCATools)
 
 ## What is TCA
 
@@ -35,10 +39,6 @@ Using TCA can help team find normative, structural, security vulnerabilities and
 ![组件图](https://tencent.github.io/CodeAnalysis/media/Components.png)
 
 ![流程图](https://tencent.github.io/CodeAnalysis/media/Flow.png)
-
-## Experience
-
-[Apply Link](http://tca.tencent.com)
 
 ## Key Features
 
@@ -55,7 +55,11 @@ Using TCA can help team find normative, structural, security vulnerabilities and
 
 ## Community
 
-- WeChat official account:腾讯云静态分析
+- WeChat Official Account: 「腾讯云静态分析」. Follow and send "Join the group" to join the official open source communication WeChat group.
+- WeChat Group：
+
+    <img src='https://tencent.github.io/CodeAnalysis/media/WechatQRCode.png' width="200"/>
+
 - QQ Group: 361791391
 - [Discussion](https://github.com/Tencent/CodeAnalysis/discussions)
 - [Wiki](https://github.com/Tencent/CodeAnalysis/wiki)
@@ -73,4 +77,10 @@ Using TCA can help team find normative, structural, security vulnerabilities and
 
 ## License
 
-TCA is [MIT licensed](LICENSE)
+TCA is [MIT licensed](LICENSE.txt).
+
+The copyright notice pertaining to the Tencent code in this repo was previously in the name of “THL A29 Limited.”  That entity has now been de-registered.  You should treat all previously distributed copies of the code as if the copyright notice was in the name of “Tencent.”
+
+### TCA Team Member
+
+![腾讯云代码分析团队成员](https://tencent.github.io/CodeAnalysis/media/TeamMembers.png)

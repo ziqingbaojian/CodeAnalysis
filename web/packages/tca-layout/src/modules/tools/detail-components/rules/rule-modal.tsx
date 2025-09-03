@@ -2,7 +2,7 @@
  * 创建规则
  */
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { Modal, Form, Input, Select, message, Switch } from 'coding-oa-uikit';
 
 // 项目内
@@ -30,7 +30,6 @@ interface CreateRuleProps {
 
 const CreateRule = (props: CreateRuleProps) => {
   const { orgSid, toolId, languages, visible, data, onClose, onUpdate, onAdd, callback } = props;
-  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const isEdit = !!data.id;
@@ -42,7 +41,7 @@ const CreateRule = (props: CreateRuleProps) => {
   }, [visible]);
 
   const onFinish = (formData: any) => {
-    const data = {
+    const params = {
       ...formData,
       languages: formData.languages || [],
       checkruledesc: {
@@ -54,7 +53,7 @@ const CreateRule = (props: CreateRuleProps) => {
     if (isEdit) {
       onUpdate(orgSid, toolId, data.id, {
         real_name: data.real_name,
-        ...data,
+        ...params,
       }).then(() => {
         message.success(t('修改成功'));
         callback();
@@ -64,7 +63,7 @@ const CreateRule = (props: CreateRuleProps) => {
           setLoading(false);
         });
     } else {
-      onAdd(orgSid, toolId, data).then(() => {
+      onAdd(orgSid, toolId, params).then(() => {
         message.success(t('创建成功'));
         callback(DEFAULT_PAGER.pageStart, DEFAULT_PAGER.pageSize);
         onClose();

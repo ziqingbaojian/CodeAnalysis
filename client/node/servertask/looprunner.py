@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -42,9 +42,10 @@ class LoopRunner(TaskRunner):
         self._token = args.token
         self._tag = args.tag
         self._org_sid = args.org_sid
-        self._create_from = args.create_from
+        self._create_from = args.create_from if args.create_from else "codedog_client"
         self._server_url = LocalConfig.get_server_url()
-        # 打印连接的sever地址
+        # 打印启动渠道和连接的sever地址
+        LogPrinter.info(f"start from {self._create_from}.")
         LogPrinter.info("using server: %s" % self._server_url)
         # 初始化与codedog服务器通信的api server实例
         self._server = RetryDogServer(self._server_url, self._token).get_api_server()
@@ -139,6 +140,21 @@ class LoopRunner(TaskRunner):
         # # 上报进度: 100% - 子任务执行结束
         # Reporter(task_request['task_params']).update_task_progress(InfoType.TaskDone)
 
+    def _modify_include_paths(self, task_request):
+        """（适配大仓场景）将scan_path添加到过滤路径include中,指定扫描对应的目录"""
+        task_params = task_request['task_params']
+        scan_path = task_params.get("scan_path")
+        if scan_path:  # 判空，避免值为None的情况
+            # 删除前后空格
+            scan_path = scan_path.strip()
+            # 如果包含头尾斜杠，去掉（包含默认扫描整个仓库时的传值/）
+            scan_path = scan_path.strip('/')
+        if scan_path:
+            format_scan_path = f"{scan_path}/*"
+            include_paths = task_params["path_filters"]["inclusion"]
+            if format_scan_path not in include_paths:  # 如果有上一阶段，已经添加到include路径，不需要重复添加
+                include_paths.append(format_scan_path)
+
     def run(self):
         """looprunner主函数"""
         # 向server注册节点
@@ -222,6 +238,9 @@ class LoopRunner(TaskRunner):
                 task_request['task_params']['job_id'] = job_id
                 task_request['task_params']['token'] = Crypto(settings.PASSWORD_KEY).encrypt(self._token)  # token加密
                 task_request['task_params']['server_url'] = self._server_url
+
+                # 大仓场景，指定目录扫描，需要将扫描目录添加到include过滤路径中
+                self._modify_include_paths(task_request)
 
                 task_log = os.path.join(task_dir, 'task.log')
                 request_file = os.path.join(task_dir, 'task_request.json')

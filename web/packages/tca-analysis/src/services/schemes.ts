@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -10,8 +10,9 @@
  * create at        2020-10-23
  */
 
-import { get, post, put, del } from './index';
-import { MAIN_SERVER_API, getMainBaseURL } from './common';
+import { get, post, put, del } from '@plat/api';
+import { MAIN_SERVER_API } from '@src/constant/api';
+import { getMainBaseURL } from './common';
 
 /**
  * 分析方案前缀
@@ -46,6 +47,13 @@ export const getLabels = () => get(`${MAIN_SERVER_API}/labels/?limit=100`);
  * 获取运行环境列表
  */
 export const getTags = (orgId: string, params: any = null) => get(`${MAIN_SERVER_API}/orgs/${orgId}/nodes/tags/`, params);
+
+/**
+ * 获取节点列表
+ * @param orgId
+ * @param params 筛选参数
+ */
+export const getNodes = (orgId: string, params: any = null) => get(`${MAIN_SERVER_API}/orgs/${orgId}/nodes/`, params);
 
 /**
  * 拉取模板配置
@@ -206,6 +214,16 @@ export const getPackagesRule = (
  * @returns
  */
 export const getRulesFilter = (orgSid: string, teamName: string, repoId: string | number, schemeId: string | number, pkgId: number) => get(`${getMainBaseURL(orgSid, teamName)}/repos/${repoId}/schemes/${schemeId}/checkprofile/checkpackages/${pkgId}/rules/filter/`);
+
+/**
+ * 代码检查 - 获取所有已配置的规则
+ */
+export const getAllCheckRules = (orgSid: string, teamName: string, repoId: string | number, schemeId: string | number, query: any) => get(`${getSchemePrefix(orgSid, teamName, repoId, schemeId)}/checkrules/`, query);
+
+/**
+ * 代码检查 - 获取所有已配置规则的筛选项
+ */
+export const getAllCheckRulesFilters = (orgSid: string, teamName: string, repoId: string | number, schemeId: string | number) => get(`${getSchemePrefix(orgSid, teamName, repoId, schemeId)}/checkrules/filter/`);
 
 /**
  * 代码检查-规则配置-修改规则状态

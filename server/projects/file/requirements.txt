@@ -1,32 +1,32 @@
 # File Server Requirements
 # for server deploy
-gunicorn==20.1.0
+gunicorn==23.0.0
 
 # for django
-Django==3.1.14
+Django==3.2.25
 
 # for django using mysql server
-pymysql==1.0.2
+pymysql==1.1.1
 
 # for rest api
-djangorestframework==3.11.2
+djangorestframework==3.14.0
 
 # for celery
 celery==5.2.3
 importlib-metadata==4.13.0
-redis==4.1.1
+redis==4.5.4
 
 # for exception log
-sentry-sdk==0.10.2
+sentry-sdk==2.8.0
 
 # for storage
-cos-python-sdk-v5==1.7.4
+cos-python-sdk-v5==1.9.29
 minio==7.1.0
 
 # for password
 pyaes==1.6.1
-pycryptodome==3.9.8
-cryptography==3.3.2
+pycryptodome==3.19.1
+cryptography==42.0.4
 
 # for monitor
 django-prometheus==2.0.0

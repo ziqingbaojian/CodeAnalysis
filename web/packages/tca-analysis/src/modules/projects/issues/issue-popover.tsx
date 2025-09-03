@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -223,7 +223,7 @@ export const Operation = ({
                           setScope(checked ? 2 : 1);
                         }}
                       />&nbsp;全局忽略
-                      <Tips title='开启全局忽略后，代码库内其他分支项目扫出相同问题会直接复用当前忽略方式，请谨慎操作！' />
+                      <Tips title='开启全局忽略后，代码库内其他分析项目扫出相同问题会直接复用当前忽略方式，请谨慎操作！' />
                     </p>
                   )
                 }

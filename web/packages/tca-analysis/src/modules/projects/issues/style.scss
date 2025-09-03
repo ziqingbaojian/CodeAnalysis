@@ -247,13 +247,10 @@
       }
     }
 
-    .modal-desc{
-      margin-left: 8px;
-    }
-
     .modal-desc, .copy-icon{
       font-size: 12px;
       color: #606c80;
+      word-break: break-all
     }
   }
 
@@ -301,6 +298,20 @@
       color: $grey-7;
       margin-left: 6px;
       cursor: pointer;
+    }
+  }
+
+  .issue-line-bar {
+    padding: 4px 20px;
+    border-top: 1px solid #e6e9ed;
+    background-color: #f5f7fa;
+
+    .line-label {
+      color: #606c80;
+    }
+
+    .line {
+      padding: 0 8px;
     }
   }
 
@@ -368,6 +379,7 @@
             padding-left: 20px;
             margin: 6px 0;
             // font-size: 13px;
+            white-space: pre-line;
           }
         }
 
@@ -408,6 +420,12 @@
             }
           }
         }
+      }
+      
+      .issue-refers {
+        padding-left: 10px;
+        color: #202d40;
+        background-color: #cceaff;
       }
     }
   }

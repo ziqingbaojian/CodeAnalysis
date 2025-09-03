@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -234,7 +234,7 @@ CODEDOG_USER_CHECK = False
 DEFAULT_USERNAME = "CodeDog"
 DEFAULT_ORIGIN_ID = "CodeDog"
 # HTTPS克隆开关
-HTTPS_CLONE_FLAG = False
+HTTPS_CLONE_FLAG = True
 
 # 时间配置
 CLOSING_JOB_TIMEOUT = timedelta(hours=12)          # 入库超时时间

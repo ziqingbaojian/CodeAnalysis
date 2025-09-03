@@ -1,70 +1,68 @@
-// Copyright (c) 2021-2022 THL A29 Limited
-//
-// This source code file is made available under MIT License
-// See LICENSE for details
-// ==============================================================================
+/**
+ * 仓库登记入口文件
+ */
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Button } from 'coding-oa-uikit';
 
-import React, { useEffect } from 'react';
-import { useParams, useHistory, useRouteMatch } from 'react-router-dom';
-import { get } from 'lodash';
+import { useURLParams, useFetch } from '@tencent/micro-frontend-shared/hooks';
+import Search, { SearchFormField } from '@tencent/micro-frontend-shared/component/search';
+import PageHeader from '@tencent/micro-frontend-shared/tdesign-component/page-header';
 
-// 项目内
-import { useStateStore } from '@src/context/store';
-import { getReposRouter } from '@src/utils/getRoutePath';
+import { getRepos } from '@src/services/common';
+import { CLOSE_REPO_MEMBER_CONF } from '@plat/modules';
+import List from './list';
+import CreateRepoModal from './create-repo';
+import style from './style.module.scss';
 
-// 模块内
-import ReposList from './repo-list';
-import { getRepoRouter } from './routes';
+const filterFields: SearchFormField[] = [{
+  name: 'scm_url_or_name',
+  type: 'string',
+  formType: 'input',
+  placeholder: '别名/地址',
+}];
 
 const Repos = () => {
-  const history = useHistory();
   const { orgSid, teamName }: any = useParams();
-  const { url } = useRouteMatch();
-  const { curRepo, repos } = useStateStore();
+  const [visible, setVisible] = useState(false);
 
-  /**
-     * 重定向到对应代码库。如果store中存在代码库且在代码库列表中，则跳转到对应代码库，否则选取第一个代码库跳转
-     * @param repoList 代码库列表
-     */
-  // const replaceToRepo = () => {
-  //     if (reposLoading) {
-  //     if (repos.length > 0) {
-  //         // 存在登记的代码库，且repoId不存在或不在repos内则重定向到第一项
-  //         if (!repoId || !repos.some((item: any) => item.id === repoId)) {
-  //             if (!repos.some((item: any) => item.id === curRepo.id)) {
-  //                 history.replace(getRepoRouter(orgSid, teamName, repos[0].id));
-  //             } else {
-  //                 history.replace(getRepoRouter(orgSid, teamName, curRepo.id));
-  //             }
-  //         } else {
-  //             // 存在repoId则直接采用该路由
-  //         }
-  //     } else {
-  //         // 待移除
-  //         // 未登记代码库，则重定向到欢迎页
-  //         history.replace(`${getReposRouter(orgSid, teamName)}/welcome`);
-  //     }
-  //     }
-  // };
+  const { filter, currentPage, pageSize, searchParams } = useURLParams(filterFields);
+  const [{ data, isLoading }, reload] = useFetch(getRepos, [orgSid, teamName, filter]);
+  const { results: listData = [], count = 0 } = data || {};
 
-  // useEffect(() => {
-  //     // 当处于xxx/repos路由时，进行重定向到对应代码库
-  //     if (!reposLoading && url === getReposRouter(orgSid, teamName)) {
-  //         replaceToRepo();
-  //     }
-  // });
-
-  useEffect(() => {
-    // 当处于xxx/repos路由时，且当前repo存在repos中，且当前路由的项目标识与当前代码库项目标识相同，则进行重定向到对应代码库
-    if (
-      url === getReposRouter(orgSid, teamName)
-            && repos.some((item: any) => item.id === curRepo.id)
-            && get(curRepo, 'project_team.name') === teamName
-    ) {
-      history.replace(`${getRepoRouter(orgSid, teamName, curRepo.id)}`);
-    }
-  });
-
-  return <ReposList repos={repos} />;
+  return (
+    <div className={style.repos}>
+      <PageHeader title='仓库登记' description='支持登记Git和SVN类型的代码库进行代码分析，Git代码库推荐使用OAUTH或专用的账号密码授权（从安全性考虑，不建议使用个人的账号密码）。'
+        action={<Button type='primary' onClick={() => setVisible(true)}>代码库登记</Button>} />
+      <Search loading={isLoading}
+        fields={filterFields}
+        searchParams={searchParams}
+      />
+      <div className={style.list}>
+        <List
+          orgSid={orgSid}
+          teamName={teamName}
+          searchWords={filter.scm_url_or_name as string}
+          loading={isLoading}
+          list={listData}
+          callback={reload}
+          pagination={{
+            current: currentPage,
+            total: count,
+            pageSize,
+          }}
+          closeMemberConf={CLOSE_REPO_MEMBER_CONF}
+        />
+      </div>
+      <CreateRepoModal
+        orgSid={orgSid}
+        teamName={teamName}
+        visible={visible}
+        onCancel={() => setVisible(false)}
+        callback={() => reload()}
+      />
+    </div>
+  );
 };
+
 export default Repos;

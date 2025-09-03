@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -118,7 +118,10 @@ class HeartBeat(object):
             host_ip = HostNetMgr().get_host_ip()
             data = {"puppy_ip": host_ip}
             # LogPrinter.info(f">>> data: {data}")
-            self._server.heart_beat(data)
+            try:
+                self._server.heart_beat(data)
+            except Exception as err:
+                LogPrinter.exception(f"heart beat error: {str(err)}")
             time.sleep(self._beat_interval)
 
     def start(self):

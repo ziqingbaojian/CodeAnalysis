@@ -13,10 +13,14 @@ export interface FetchCustomParams {
   showError?: boolean;
   /** fetch 成功处理 */
   resultHandler?: (data: any) => any;
-  /** fetch 失败处理 */
+  /** fetch 失败处理，用于处理失败结果 */
   failResultHandler?: (data: any) => any;
   /** fetch 请求状态处理 */
   statusHandler?: (response: Response) => void;
+  /** fetch 文件下载处理 */
+  fileHandler?: (response: Response) => any;
+  // message plugin
+  messagePlugin?: any;
 }
 
 interface RequestCustom extends FetchCustomParams {
@@ -54,7 +58,7 @@ export const fetch = (input: RequestInfo, init?: RequestInit, customParams?: Fet
       init.headers = Object.assign({}, init.headers, headers);
     }
   }
-  const fetchPromise = new Promise((resolve, reject) => {
+  const fetchPromise = new Promise<any>((resolve, reject) => {
     window.fetch(input, init).then((response) => {
       // 如果请求被中断，则return
       if (custom.isAbort) {
@@ -67,8 +71,15 @@ export const fetch = (input: RequestInfo, init?: RequestInit, customParams?: Fet
       if (response.status === 204) {
         return resolve({ code: 0 });
       }
-      if (response.status === 404) {
-        return reject(failResultHandler({ msg: '接口不存在' }, custom));
+      if (response.status === 401) {
+        return reject(failResultHandler({ msg: '登录态已过期，重新登录系统！' }, custom));
+      }
+      // if (response.status === 404) {
+      //   return reject(failResultHandler({ msg: '接口不存在' }, custom));
+      // }
+      // 文件下载自定义结果处理
+      if (custom.fileHandler) {
+        return resolve(custom.fileHandler(response));
       }
       response.json().then((jsonData) => {
         if (response.ok) {
@@ -95,14 +106,14 @@ export const fetch = (input: RequestInfo, init?: RequestInit, customParams?: Fet
  * @param custom 自定义request参数
  * @returns Promise
  */
-const fetchTimeout = (custom: RequestCustom) => new Promise((resolve, reject) => {
+const fetchTimeout = (custom: RequestCustom) => new Promise<any>((resolve, reject) => {
   const timer = setTimeout(() => {
     clearTimeout(timer);
     // 如果还未收到响应结果，则执行超时逻辑，中断结果
     if (!custom.isFetched) {
       // 还未收到响应，则开始超时逻辑，并标记fetch需要放弃
       custom.isAbort = true;
-      custom.showError && message.error('网络开小差了，稍后再试');
+      custom.showError && (custom.messagePlugin || message).error('网络开小差了，稍后再试');
       reject({ msg: 'timeout' });
     }
   }, (custom.timeout || 30) * 1000);
@@ -129,12 +140,12 @@ const resultHandler = (jsonData: any, custom: RequestCustom) => {
  */
 const failResultHandler = (jsonData: any, custom: RequestCustom) => {
   // 自定义失败结果处理
+  let { msg } = jsonData;
   if (custom.failResultHandler) {
-    return custom.failResultHandler(jsonData);
+    msg = custom.failResultHandler(jsonData);
   }
-  const { msg } = jsonData;
   if (msg && custom.showError) {
-    message.error(getFailMessage(msg));
+    (custom.messagePlugin || message).error(getFailMessage(msg));
   }
   return jsonData;
 };
@@ -144,20 +155,38 @@ const failResultHandler = (jsonData: any, custom: RequestCustom) => {
  * @param msg 信息
  * @returns 返回错误信息
  */
-const getFailMessage: any = (msg: any) => {
+export const getFailMessage: any = (msg: any) => {
   if (msg) {
     if (typeof msg === 'string') {
       return msg;
     }
     if (Array.isArray(msg)) {
-      return msg.pop();
+      return getFailMessage(msg.pop());
     }
     if (typeof msg === 'object' && Object.keys(msg).length > 0) {
       // 遍历 object
-      return getFailMessage(msg[Object.keys(msg).pop() as any]);
+      return getFailMessage(Object.values(msg)?.pop());
     }
   }
   return '接口请求失败';
+};
+
+/**
+ * GET 方法下载文件结果处理
+ * @param response
+ * @returns
+ */
+const getFileResultHandler = (response: Response) => response;
+
+/**
+ * POST 方法下载文件结果处理
+ * @param response
+ */
+const postFileResultHandler = (response: Response) => {
+  if (response.ok) {
+    return Promise.resolve(response);
+  }
+  return Promise.reject();
 };
 
 /** fetch 请求管理模块 */
@@ -171,9 +200,9 @@ export class FetchManager {
     method: 'GET',
   }, { ...this.custom, ...custom });
 
-  post = (url: string, data: any, custom?: FetchCustomParams) => fetch(url, {
+  post = (url: string, data?: any, custom?: FetchCustomParams) => fetch(url, {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: data ? JSON.stringify(data) : null,
   }, { ...this.custom, ...custom });
 
   put = (url: string, data: any, custom?: FetchCustomParams) => fetch(url, {
@@ -194,13 +223,31 @@ export class FetchManager {
   getFile = (url: string, data?: any, custom?: FetchCustomParams) => fetch(url, {
     method: 'GET',
     body: data ? JSON.stringify(data) : null,
+  }, {
+    fileHandler: getFileResultHandler,
+    ...this.custom,
+    ...custom,
+  });
+
+  postFile = (url: string, data?: any, custom?: FetchCustomParams) => fetch(url, {
+    method: 'POST',
+    body: data ? JSON.stringify(data) : null,
+  }, {
+    fileHandler: postFileResultHandler,
+    ...this.custom,
+    ...custom,
+  });
+
+  upload = (url: string, data: any, custom?: FetchCustomParams) => fetch(url, {
+    method: 'POST',
+    body: data,
   }, { ...this.custom, ...custom });
 }
 
 /** 初始化默认的fetch模块 */
-const fetchManager = new FetchManager();
+export const fetchManager = new FetchManager();
 
-export const { get, post, put, patch, del } = fetchManager;
+export const { get, post, put, patch, del, getFile, postFile } = fetchManager;
 
 /**
  * 初始化API URL 提供 restful api
@@ -299,14 +346,3 @@ export class FetchAPIManager {
   */
   del = (data?: any, extraUrl = '', custom?: FetchCustomParams) => this.fm.del(`${this.url}${extraUrl}/`, data, custom);
 }
-
-export default {
-  fetch,
-  FetchManager,
-  FetchAPIManager,
-  get,
-  post,
-  put,
-  patch,
-  del,
-};

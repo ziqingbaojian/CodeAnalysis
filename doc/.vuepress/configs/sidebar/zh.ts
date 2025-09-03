@@ -30,6 +30,7 @@ export const zh: SidebarConfig = {
             '/zh/guide/代码检查/工具/TCA-Armory-R.md',
             '/zh/guide/代码检查/工具/TCA-Armory-C1.md',
             '/zh/guide/代码检查/工具/TCA-Armory-Q1.md',
+            '/zh/guide/代码检查/工具/Error-Prone.md',
           ],
         },
         {
@@ -37,6 +38,10 @@ export const zh: SidebarConfig = {
           children: [
             '/zh/guide/代码检查/规则包/cpp_doc.md',
             '/zh/guide/代码检查/规则包/enhanced_safety_java.md',
+            '/zh/guide/代码检查/规则包/test_case_verify_go.md',
+            '/zh/guide/代码检查/规则包/code_spec_oc.md',
+            '/zh/guide/代码检查/规则包/front_end_framework_check.md',
+            '/zh/guide/代码检查/规则包/dependency_vul.md',
           ],
         },
       ]
@@ -60,6 +65,12 @@ export const zh: SidebarConfig = {
         '/zh/guide/工具管理/工具列表.md',
         '/zh/guide/工具管理/自定义规则.md',
         '/zh/guide/工具管理/自定义工具.md',
+      ]
+    },
+    {
+      text: '个人中心',
+      children: [
+        '/zh/guide/个人中心/个人令牌.md',
       ]
     },
     {
@@ -97,6 +108,12 @@ export const zh: SidebarConfig = {
         '/zh/guide/web/deploySource.md',
       ]
     },
+    {
+      text: '插件',
+      children: [
+        '/zh/guide/插件/Jenkins_Plugin.md',
+      ]
+    },
   ],
   '/zh/advanced/': [
     {
@@ -104,6 +121,7 @@ export const zh: SidebarConfig = {
       children: [
         '/zh/advanced/任务分布式执行.md',
         '/zh/advanced/集成代码分析工具.md',
+        '/zh/advanced/使用自建工具git库.md'
       ],
     },
     {

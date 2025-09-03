@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -9,15 +9,14 @@
  */
 
 import React from 'react';
-import LoadingIcon from 'coding-oa-uikit/lib/icon/Loading';
+import { Loading, LoadingProps } from 'tdesign-react';
 
 import style from './style.scss';
 
-const Loading = () => (
+const SingleLoading = (props: LoadingProps) => (
         <div className={style.loading}>
-            <LoadingIcon className={style.icon}/>
-             加载中
+            <Loading {...props} />
         </div>
 );
 
-export default Loading;
+export default SingleLoading;

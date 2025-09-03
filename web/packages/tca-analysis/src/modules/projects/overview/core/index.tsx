@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -9,7 +9,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { Row, Col, Tooltip } from 'coding-oa-uikit';
 import QuestionCircle from 'coding-oa-uikit/lib/icon/QuestionCircle';
 import classnames from 'classnames';
@@ -48,7 +48,6 @@ interface IProps {
 }
 
 const Core = (props: IProps) => {
-  const { t } = useTranslation();
   const { latestLintData, briefCycData, briefDupData, conf } = props;
   const [ccUndealCount, setCcUndealCount] = useState(0);
   const params: any = useParams();

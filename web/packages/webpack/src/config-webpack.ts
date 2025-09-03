@@ -12,6 +12,8 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 /** tsconfig-paths 插件 */
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+/** 快速更新插件 */
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 /** 自定义插件，用于生成资源文件地址 */
 import ConfigWebpackPlugin from './config-webpack-plugin';
 import eslintWebpackPlugin from './config-eslint-webpack-plugin';
@@ -23,8 +25,6 @@ import 'webpack-dev-server';
 import defaultEnvConfig, { EnvConfig, Envs } from './env';
 import { isTrue, modTsConfigPaths } from './util';
 import { StrBoolean } from './type';
-
-const smp = new SpeedMeasurePlugin();
 
 /** 页面资源压缩配置 */
 const htmlMinify = {
@@ -51,6 +51,7 @@ const {
   PLATFORM_ENV,
   BUNDLE_ANALYZER,
   ENABLE_EXTERNALS,
+  ENABLE_SPEED_MEASURE,
   WEBPACK_COS_ENABLE,
 } = process.env;
 /** 根据NODE_ENV判断是否为开发模式 */
@@ -88,7 +89,7 @@ export const webpackConfig = (options?: Options) => {
   } = options || {};
   const outDir = path.resolve(BASE_PATH, isTrue(ENABLE_MANAGE) ? `${outputPath}-admin` : outputPath);
   const templatePath = path.resolve(BASE_PATH, publicDir, 'index.html');
-  const { envs, runtimeEnvs } = envConfig ? merge(defaultEnvConfig, envConfig) : defaultEnvConfig;
+  const { envs, runtimeEnvs = {} } = envConfig ? merge(defaultEnvConfig, envConfig) : defaultEnvConfig;
   if (!NAME) {
     throw new Error('webpack 未获取到 process.env.npm_package_name，请确认package.json中是否存在name字段');
   }
@@ -107,11 +108,6 @@ export const webpackConfig = (options?: Options) => {
       // Webpack 5 不再自动填充 Node.js 核心模块, 必须从 npm 安装兼容模块并自己包含它们
       fallback: {
         path: require.resolve('path-browserify'),
-      },
-      alias: {
-        // '@src': path.resolve(BASE_PATH, 'src'),
-        // '@plat': path.resolve(BASE_PATH, `src/plat/${PLATFORM_ENV}`),
-        'react-dom': '@hot-loader/react-dom',
       },
       modules: ['node_modules'],
       plugins: [new TsconfigPathsPlugin({
@@ -147,8 +143,8 @@ export const webpackConfig = (options?: Options) => {
               '@babel/proposal-class-properties',
               '@babel/proposal-object-rest-spread',
               '@babel/plugin-transform-runtime',
-              'react-hot-loader/babel',
-            ],
+              IS_DEV && require.resolve('react-refresh/babel'),
+            ].filter(Boolean),
             // rootMode: 'upward',
           },
         },
@@ -210,15 +206,14 @@ export const webpackConfig = (options?: Options) => {
       runtimeChunk: true,
       splitChunks: {
         chunks: 'all',
-        name: (module: any, chunks: Array<any>, cacheGroupKey: string) => {
-          const allChunksNames = chunks.map(item => item.name).join('~');
-          return `${cacheGroupKey}~${allChunksNames}`;
-        },
         cacheGroups: {
           vendors: {
             test: /[\\/]node_modules[\\/]/,
             chunks: 'all',
+            priority: -10,
+            reuseExistingChunk: true,
             enforce: true,
+            name: `vendors~${NAME}`,
           },
         },
       },
@@ -241,6 +236,7 @@ export const webpackConfig = (options?: Options) => {
               '**/index.html',
             ],
           },
+          noErrorOnMissing: true,
         }],
       }),
       new HtmlWebpackPlugin({
@@ -288,9 +284,11 @@ export const webpackConfig = (options?: Options) => {
         allowedHosts: 'all',
         host,
         port,
-        // client: {
-        //   webSocketURL,
-        // },
+        client: {
+          // progress: true,
+          overlay: false,
+          // webSocketURL,
+        },
         historyApiFallback: true,
         compress: true,
         devMiddleware: {
@@ -302,6 +300,7 @@ export const webpackConfig = (options?: Options) => {
       },
       plugins: [
         eslintWebpackPlugin,
+        new ReactRefreshWebpackPlugin(),
       ],
     });
   } else {
@@ -313,6 +312,7 @@ export const webpackConfig = (options?: Options) => {
         'react-redux': 'ReactRedux',
         classnames: 'Classnames',
         'coding-oa-uikit': 'CodingOAUikit',
+        'tdesign-react': 'TdesignReact',
         lodash: 'Lodash',
       } : undefined,
     });
@@ -326,7 +326,10 @@ export const webpackConfig = (options?: Options) => {
   }
   // 避免MiniCssExtractPlugin与SpeedMeasurePlugin异常
   // https://github.com/stephencookdev/speed-measure-webpack-plugin/issues/167
-  config = smp.wrap(config);
+  if (isTrue(ENABLE_SPEED_MEASURE)) {
+    const smp = new SpeedMeasurePlugin();
+    config = smp.wrap(config);
+  }
   config.plugins?.push(new MiniCssExtractPlugin({
     filename: `[name]${IS_DEV ? '' : '-[contenthash:8]'}.css`,
     chunkFilename: `[name]${IS_DEV ? '' : '-[contenthash:8]'}.css`,

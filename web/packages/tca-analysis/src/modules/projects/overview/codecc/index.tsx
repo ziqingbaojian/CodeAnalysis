@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -8,7 +8,7 @@
  * 分支概览圈复杂度详情
  */
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { Radio, Row, Col } from 'coding-oa-uikit';
 import classnames from 'classnames';
 import { get, minBy } from 'lodash';
@@ -59,7 +59,6 @@ const CodeCC = ({ cycScans }: IProps) => {
   const cycLineDatas = getCyCLineChartData(cycScans, standardValue);
   const cycLineData = get(cycLineDatas, typeValue, []);
   const cycPieData = getCycPieChartData(cycScans, standardValue);
-  const { t } = useTranslation();
 
   // 校验是否展示标准切换radio，如果最新的数据，不存在custom_summary，则不显示 radio
   const isShowStandardRadio = () => {

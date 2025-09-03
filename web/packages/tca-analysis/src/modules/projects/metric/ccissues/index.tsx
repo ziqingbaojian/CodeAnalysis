@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -78,7 +78,7 @@ const CCIssues = (props: CCIssuesProps) => {
       .then((response: any) => {
         setCount(response.count);
         callback?.(response.results || []);
-        history.push(`${location.pathname}?${qs.stringify(params)}`);
+        history.replace(`${location.pathname}?${qs.stringify(params)}`);
         setData({
           list: response.results || [],
           next: response.next,

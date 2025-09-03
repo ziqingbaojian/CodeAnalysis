@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2021-2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -13,7 +13,6 @@ Infer: a code static analyzer for c/c++/oc/java.
 import shlex
 import os
 import json
-import ijson
 
 from util.subprocc import SubProcController
 from util.logutil import LogPrinter
@@ -286,6 +285,8 @@ class Infer(object):
         ]
         :return:
         """
+        import ijson
+
         f = open(error_output, "r")
         parser = ijson.parse(f)
         is_in_issue = False

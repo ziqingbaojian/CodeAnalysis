@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -8,92 +8,61 @@
  * 模板生成的分析方案列表
  */
 
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Table } from 'coding-oa-uikit';
+import React from 'react';
+import { useRequest } from 'ahooks';
 import { get } from 'lodash';
 
-import { getSchemeRouter } from '@src/utils/getRoutePath';
-import { DEFAULT_PAGER } from '@src/constant';
+import Table from '@tencent/micro-frontend-shared/tdesign-component/table';
 import { getSchemeList } from '@src/services/template';
-
-import style from '../style.scss';
-
-const { Column } = Table;
+import { useURLParams } from '@tencent/micro-frontend-shared/hooks';
 
 interface SchemeListProps {
   orgSid: string;
-  teamName: string;
   tmplId: number;
 }
 
 const SchemeList = (props: SchemeListProps) => {
-  const { orgSid, teamName, tmplId } = props;
+  const { orgSid, tmplId } = props;
+  const { currentPage, pageSize, filter } = useURLParams();
 
-  const [list, setList] = useState<any>([]);
-  const [loading, setLoading] = useState(false);
-  const [pager, setPager] = useState(DEFAULT_PAGER);
-  const { count, pageSize, pageStart } = pager;
+  const { data = {}, loading } = useRequest(() => getSchemeList(orgSid, tmplId, filter), {
+    refreshDeps: [orgSid, tmplId, filter],
+  });
 
-  useEffect(() => {
-    getListData();
-  }, [tmplId]);
-
-  const getListData = (offset = pageStart, limit = pageSize) => {
-    setLoading(true);
-    getSchemeList(orgSid, tmplId, { offset, limit }).then((response) => {
-      setPager({
-        pageSize: limit,
-        pageStart: offset,
-        count: response.count,
-      });
-
-      setList(response.results || []);
-    })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  const onChangePageSize = (page: number, pageSize: number) => {
-    getListData((page - 1) * pageSize, pageSize);
-  };
-
-  const onShowSizeChange = (current: number, size: number) => {
-    getListData(DEFAULT_PAGER.pageStart, size);
-  };
+  const columns = [
+    {
+      colKey: 'name',
+      title: '分析方案名称',
+      cell: ({ row }: any) => (row.name),
+    },
+    {
+      colKey: 'repo',
+      title: '所属代码库',
+      cell: ({ row }: any) => (
+        <a
+          className='link-name'
+          target='_blank'
+          href={get(row, 'repo.scm_url')}
+          rel="noreferrer"
+        >
+          {get(row, 'repo.scm_url')}
+        </a>
+      ),
+    },
+  ];
 
   return (
-        <Table
-            dataSource={list}
-            rowKey={(item: any) => item.id}
-            loading={loading}
-            className={style.schemeList}
-            pagination={{
-              size: 'default',
-              current: Math.floor(pageStart / pageSize) + 1,
-              total: count,
-              pageSize,
-              showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]} - ${range[1]} 条，共 ${total} 条`,
-              onChange: onChangePageSize,
-              onShowSizeChange,
-            }}
-        >
-            <Column
-                title="分析方案名称"
-                dataIndex="name"
-                key="name"
-                render={(name: string, data: any) => (
-                    <Link className='link-name' target='_blank' to={`${getSchemeRouter(orgSid, teamName, get(data, 'repo.id'), data.id)}/basic`}>{name}</Link>
-                )}
-            />
-            <Column
-                title="所属代码库"
-                dataIndex={['repo', 'scm_url']}
-                key="repo"
-            />
-        </Table>
+    <Table
+      rowKey='id'
+      data={data.results || []}
+      columns={columns}
+      loading={loading}
+      pagination={{
+        current: currentPage,
+        total: data.count || 0,
+        pageSize,
+      }}
+    />
   );
 };
 

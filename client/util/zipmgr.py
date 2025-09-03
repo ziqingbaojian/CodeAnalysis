@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# Copyright (c) 2022 THL A29 Limited
+# Copyright (c) 2021-2025 Tencent
 #
 # This source code file is made available under MIT License
 # See LICENSE for details
@@ -17,7 +17,6 @@ import zipfile
 from settings.base import WORK_DIR
 from util.subprocc import SubProcController
 from util.exceptions import ZIPError, TransferModuleError, NodeConfigError
-from task.basic.common import subprocc_log
 from util.pathlib import PathMgr
 from util.envset import EnvSet
 
@@ -71,8 +70,8 @@ class Zip(object):
                 shell=False,
                 stdout_filepath=None,
                 stderr_filepath=None,
-                stdout_line_callback=subprocc_log,
-                stderr_line_callback=subprocc_log,
+                stdout_line_callback=self.compress_subprocc_log,
+                stderr_line_callback=self.compress_subprocc_log,
                 env=EnvSet().get_origin_env(),
             )
             process.wait(ZIP_TIME_LIMIT)
@@ -97,7 +96,7 @@ class Zip(object):
 
         args = PathMgr().format_cmd_arg_list(args)
         if print_enable:
-            output = subprocc_log
+            output = self.subprocc_log
         else:
             output = None
         process = SubProcController(
@@ -107,7 +106,7 @@ class Zip(object):
             stdout_filepath=None,
             stderr_filepath=None,
             stdout_line_callback=output,
-            stderr_line_callback=subprocc_log,
+            stderr_line_callback=self.subprocc_log,
             env=EnvSet().get_origin_env(),
         )
         process.wait(ZIP_TIME_LIMIT)
@@ -120,15 +119,33 @@ class Zip(object):
     def decompress(self, zip_file, path):
         logger.info("zip模块执行解压操作...")
         # 20190927 bug-fixed, 防止在当前目录下删除当前目录，出现权限异常情况
-        os.chdir("../task")
-        if os.path.exists(path):
-            PathMgr().rmpath(path)
+        cur_dir = os.getcwd()
+        cur_dir_is_changed = False
+        if PathMgr().format_path(cur_dir) == PathMgr().format_path(path):
+            logger.info("Decompress dir is current dir, can not delete it directory, change to parent directory first.")
+            # 如果要删除的是当前工作目录，先切换到上层目录，再删除
+            os.chdir("..")
+            cur_dir_is_changed = True
 
-        self.decompress_by_7z(zip_file, path, print_enable=True)
+        try:
+            if os.path.exists(path):
+                PathMgr().rmpath(path)
 
-        if os.path.exists(WORK_DIR):
-            os.chdir(WORK_DIR)
+            self.decompress_by_7z(zip_file, path, print_enable=True)
+        finally:
+            # 恢复进入到当前工作目录
+            logger.info("Go back to the current working directory.")
+            if cur_dir_is_changed and os.path.exists(cur_dir):
+                os.chdir(cur_dir)
         return True
+
+    def subprocc_log(self, line):
+        logger.info(line)
+        if line.find("Can not open the file as archive"):
+            raise TransferModuleError("解压失败，压缩文件损坏或格式不对")
+    
+    def compress_subprocc_log(self, line):
+        logger.info(line)
 
     @staticmethod
     def zipfile_compress(path, zip_file):
@@ -142,7 +159,7 @@ class Zip(object):
         zp = zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED)
         for dirpath, dirnames, filenames in os.walk(path):
             fpath = dirpath.replace(path, "")  # 这一句很重要，不replace的话，就从根目录开始复制
-            fpath = fpath and fpath + os.sep or ""
+            fpath = fpath and fpath + os.sep or ""  # 这句话理解我也点郁闷，实现当前文件夹以及包含的所有文件的压缩
             for filename in filenames:
                 zp.write(os.path.join(dirpath, filename), fpath + filename)
         zp.close()

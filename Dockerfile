@@ -1,9 +1,9 @@
-FROM python:3.7-slim
+FROM python:3.7-slim-bullseye
 
 ENV REDIS_PASSWD=tca2022
 ENV MYSQL_PASSWORD=TCA!@#2021
 
-ARG EXTRA_TOOLS="gnupg curl wget jq net-tools procps python3-dev default-libmysqlclient-dev locales inotify-tools gcc subversion git telnet iputils-ping vim openssh-client redis nginx unzip"
+ARG EXTRA_TOOLS="gnupg curl wget jq net-tools procps python3-dev default-libmysqlclient-dev locales inotify-tools gcc subversion git telnet iputils-ping vim openssh-client redis nginx unzip libsasl2-dev libldap2-dev libssl-dev"
 
 # RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
 #     && echo 'deb http://mirrors.tencent.com/debian/ bullseye main non-free contrib' > /etc/apt/sources.list \
@@ -27,7 +27,7 @@ RUN set -ex && cd / \
     && ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
 
 RUN pip install -U setuptools pip \
-    && pip install gunicorn==20.1.0 celery==5.2.3 supervisor==4.2.4 
+    && pip install gunicorn==23.0.0 celery==5.2.3 supervisor==4.2.4
 
 COPY ./ /CodeAnalysis/
 WORKDIR /CodeAnalysis/

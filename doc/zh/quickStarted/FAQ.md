@@ -193,6 +193,27 @@ ln -s /usr/local/python3/bin/gunicorn /usr/local/bin/gunicorn
 ln -s /usr/local/python3/bin/celery /usr/local/bin/celery
 ```
 
+#### 1.9 脚本安装过程报错，出现格式问题
+
+使用docker方式部署项目时，提示 
+```
+fatal: 无法访问 'https://git.code.tencent.com/TCA/tca-tools/tca_lib.git/': URL using bad/illegal format or missing URL.
+Download lib failed
+```
+该如何处理。
+
+出错原因可能是Windows系统、和macOs系统、linux系统的行分隔符不同，可以先查看当前文件的换行符是 CRLF 还是LF，
+如果要部署在Windows系统系统上，行分隔符应该为CRLF格式，部署在linux和macOS系统预期是LF格式，如果不一致需要进行手动修改。
+
+修改方式可以选择：
+1、使用pycharm打开项目，依次点击”File”->”Settings”->”Editor”->”Code Style”->”General”
+在面板中，可以找到”Line separator”选项，根据要部署的系统选择行分隔符格式。
+2、也可以使用dos2unix、unix2dos等转换命令，例如从Windows系统打包到Linux系统，当前行分隔符为CRLF，需要对脚本执行 ``dos2unix fileName``指令进行转换 ，注意使用该指令前需要先进行安装。
+
+完成以上操作之后再对代码进行打包，即可部署运行。
+
+
+
 ### 2. 服务启动与初始化
 
 #### 2.1 服务占用端口异常
@@ -245,6 +266,12 @@ TCA 本地部署启动后，会监听多个端口：
     - 服务启动日志：``server/projects/scmproxy/nohup.out``
     - 服务运行日志：``server/projects/scmproxy/logs/scmproxy.log``
 
+#### 2.3 服务启动失败
+
+1. 启动服务报错 ``json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)``
+    - 检查``config.ini``文件和``codedog.ini``文件是否按照json格式正确填写
+    - 如果``config.ini``文件中的 ``【SERVER_URL】``已正确填写，则检查``codedog.ini``文件中是否有填写``codedog_env``配置项。如果有填写，往往因为填写有误（比如URL缺少最后的`/`）导致报错。建议直接删除``codedog.ini``文件的``codedog_env``配置项（``config.ini``已配置``【SERVER_URL】``，无需重复配置），再尝试重启服务。
+
 ### 3. 平台使用
 
 #### 3.1 平台登录的默认账号密码是什么？
@@ -292,6 +319,13 @@ TCA 本地部署启动后，会监听多个端口：
     - 可以手动在机器/容器中执行``git clone xxxx``（xxx表示待登记的代码库），检查看看是否能够正常拉取
 5. scmproxy所在的机器git版本较低，出现``unknown option `local` ``错误
     - 可以升级机器上的git版本，目前工具支持最低的git版本为``1.8.3.1``
+
+#### 3.3.2 代码库登记成功后，开启第一次代码分析时，出现代码库及账号不匹配
+
+该错误出现可能有以下几个原因：
+
+1. 代码仓库地址不支持https访问，但分析时请求的https访问
+    - 修改 ``.docker_temp/configs/config.sh``, 将HTTPS_CLONE_FLAG调整为false, 然后重启容器``docker restart tca-services``
 
 #### 3.4 查看问题文件提示**获取代码信息耗时较久，请稍后再试**
 

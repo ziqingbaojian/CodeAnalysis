@@ -1,4 +1,4 @@
-import { t } from '@tencent/micro-frontend-shared/i18n';
+import { t } from '@src/utils/i18n';
 import { generateOptions } from '@tencent/micro-frontend-shared/util';
 
 /** 节点工作状态 */
@@ -14,6 +14,9 @@ export const STATE_CHOICES = {
   [NodeStateEnum.BUSY]: '忙碌',
   [NodeStateEnum.FREE]: '空闲',
 };
+
+/** 节点工作状态 options */
+export const NODE_STATE_OPTIONS = generateOptions(STATE_CHOICES, true);
 
 /** 节点可用状态 */
 export enum NodeEnabledEnum {

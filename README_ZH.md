@@ -6,21 +6,27 @@
     <em>代号：CodeDog</em>
 </p>
 
-[![license](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat)](LICENSE) [![docs](https://img.shields.io/badge/docs-read-brightgreen.svg?style=flat)](https://tencent.github.io/CodeAnalysis/)
+[![license](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat)](LICENSE.txt) [![docs](https://img.shields.io/badge/docs-read-brightgreen.svg?style=flat)](https://tencent.github.io/CodeAnalysis/)
 
-## TCA-官方网址
+[English](README.md) | [简体中文](README_ZH.md)
 
-[https://cloud.tencent.com/product/tcap](https://cloud.tencent.com/product/tcap)
+## TCA-官方
 
-## TCA-Github代码库
+[官方网址：https://tca.tencent.com](https://tca.tencent.com)
 
-[https://tencent.github.io/CodeAnalysis/](https://tencent.github.io/CodeAnalysis/)
+[官方介绍：https://cloud.tencent.com/product/tcap](https://cloud.tencent.com/product/tcap)
 
-[https://github.com/TCATools](https://github.com/TCATools)
+## TCA-CNB代码库（境内-高速网络）
 
-## TCA-国内镜像工蜂代码库
+[境内开源：https://cnb.cool/tencent/cloud/tca/code-analysis](https://cnb.cool/tencent/cloud/tca/code-analysis)
 
-[https://git.code.tencent.com/Tencent_Open_Source/CodeAnalysis.git](https://git.code.tencent.com/Tencent_Open_Source/CodeAnalysis.git)
+[境内开源：https://cnb.cool/tencent/cloud/tca](https://cnb.cool/tencent/cloud/tca)
+
+## TCA-Github代码库（境外）
+
+[境外开源：https://tencent.github.io/CodeAnalysis/](https://tencent.github.io/CodeAnalysis/)
+
+[境外开源：https://github.com/TCATools](https://github.com/TCATools)
 
 ## TCA
 
@@ -33,10 +39,6 @@
 ![组件图](https://tencent.github.io/CodeAnalysis/media/Components.png)
 
 ![流程图](https://tencent.github.io/CodeAnalysis/media/Flow.png)
-
-## 体验
-
-[官方版本](http://tca.tencent.com)
 
 ## 关键功能
 
@@ -54,6 +56,10 @@
 ## 社区
 
 - 微信公众号：「腾讯云静态分析」，关注并发送“进群”即可加入官方开源交流微信群
+- 微信群金牌🏅服务群：
+
+    <img src='https://tencent.github.io/CodeAnalysis/media/WechatQRCode.png' width="200"/>
+
 - QQ交流群：361791391  
 - [GitHub讨论区](https://github.com/Tencent/CodeAnalysis/discussions)
 - [Wiki](https://github.com/Tencent/CodeAnalysis/wiki)
@@ -71,4 +77,10 @@
 
 ## 许可
 
-TCA 使用 [MIT 许可证](LICENSE)
+TCA 使用 [MIT 许可证](LICENSE.txt)。
+
+本代码库中涉及腾讯代码的版权声明之前归属于“THL A29 Limited”。该实体现已注销。您应将所有之前分发的代码副本视为版权声明归属于“腾讯”。
+
+### TCA 团队成员
+
+![腾讯云代码分析团队成员](https://tencent.github.io/CodeAnalysis/media/TeamMembers.png)

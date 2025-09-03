@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -20,12 +20,12 @@ interface FilterProps {
 const Filter = (props: FilterProps & any) => {
   const { children, ...otherProps } = props;
   return (
-        <Form
-            {...otherProps}
-            layout="inline"
-        >
-            {children}
-        </Form>
+    <Form
+      {...otherProps}
+      layout="inline"
+    >
+      {children}
+    </Form>
   );
 };
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory, Switch, Route, Redirect } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { message } from 'coding-oa-uikit';
-import Loading from '@tencent/micro-frontend-shared/component/loading';
+import { message } from 'tdesign-react';
+
+import Loading from '@tencent/micro-frontend-shared/tdesign-component/loading';
 
 // 项目内
-import Header from '@src/modules/layout/header';
+import Header from '@plat/modules/header';
 import Container from '@src/component/container';
 import Members from '@src/modules/team/components/members';
 import Profile from '@src/modules/team/components/profile';
@@ -18,22 +19,13 @@ import Toollibs from '@src/modules/tool-libs';
 import Nodes from '@src/modules/nodes';
 import NodeProcess from '@src/modules/nodes/process';
 import { getTeamInfo } from '@src/services/team';
-import { setPvOrgInfo } from '@src/utils/matomo';
 import Constant from '@src/reducer/constant';
 import { getTeamsRouter } from '@src/utils/getRoutePath';
+import { reportOrgInfo } from '@plat/util';
 
 // 模块内
 import Sidebar from './sidebar';
 
-const getComponent = (Component: any) => (
-  <>
-    <Header />
-    <Sidebar />
-    <Container>
-      <Component />
-    </Container>
-  </>
-);
 
 const TeamLayout = () => {
   const [loading, setLoading] = useState(true);
@@ -50,7 +42,7 @@ const TeamLayout = () => {
     setLoading(true);
     getTeamInfo(orgSid)
       .then((response: any) => {
-        setPvOrgInfo(response);
+        reportOrgInfo(response);
         if (response.status > 1) {
           message.error('您的团队还未审核通过');
           history.replace(getTeamsRouter());
@@ -71,29 +63,36 @@ const TeamLayout = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [orgSid]);
+  }, [orgSid, storeDispatch, history]);
 
   if (loading) {
     return <Loading />;
   }
 
   return (
-    <>
-      <Switch>
-        <Route path={'/t/:orgSid'} exact render={() => getComponent(Workspace)} />
-        <Route path={'/t/:orgSid/workspace'} render={() => getComponent(Workspace)} />
-        <Route path={'/t/:orgSid/projects'} render={() => getComponent(Projects)} />
-        <Route path={'/t/:orgSid/profile'} render={() => getComponent(Profile)} />
-        <Route path={'/t/:orgSid/members'} render={() => getComponent(Members)} />
-        <Route key='detail' exact path="/t/:orgSid/tools/:toolId/:tab?" render={() => getComponent(ToolDetail)} />
-        <Route key='tools' exact path="/t/:orgSid/tools" render={() => getComponent(Tools)} />
-        <Route key='toollibs' exact path="/t/:orgSid/toollibs" render={() => getComponent(Toollibs)} />
-        <Route path="/t/:orgSid/nodes/:nodeId/process" render={() =>  getComponent(NodeProcess)} />
-        <Route path="/t/:orgSid/nodes/" render={() =>  getComponent(Nodes)} />
-        <Route path="/t/:orgSid/p/:name/" render={() => <Analysis />} />
-        <Redirect to="/" />
-      </Switch>
-    </>
+    <Switch>
+      <Route path="/t/:orgSid/p/:name/" component={Analysis} />
+      <>
+        <Header />
+        <Sidebar />
+        <Container>
+          <Switch>
+            <Route path={'/t/:orgSid'} exact component={Workspace} />
+            <Route path={'/t/:orgSid/workspace'} component={Workspace} />
+            <Route path={'/t/:orgSid/projects'} component={Projects} />
+            <Route path={'/t/:orgSid/profile'} component={Profile} />
+            <Route path={'/t/:orgSid/members'} component={Members} />
+            <Route exact path="/t/:orgSid/tools/:toolId/:tab?" component={ToolDetail} />
+            <Route exact path="/t/:orgSid/tools" component={Tools} />
+            <Route exact path="/t/:orgSid/toollibs" component={Toollibs} />
+            <Route path="/t/:orgSid/nodes/:nodeId/process" component={NodeProcess} />
+            <Route path="/t/:orgSid/nodes/" component={Nodes} />
+            <Route path={'/t/:orgSid/template'} component={null} />
+            <Redirect to="/" />
+          </Switch>
+        </Container>
+      </>
+    </Switch>
   );
 };
 

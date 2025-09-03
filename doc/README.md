@@ -13,7 +13,7 @@ features:
   - title: 稳定可靠的架构
     details: 支持分布式云原生计算架构，支持灵活扩缩容，执行更快更稳定。
   - title: 多工具支持
-    details: 已集成众多自研、知名开源工具等，采用分层分离架构，可满足团队快速自助管理工具。
+    details: 已集成众多自研、知名开源工具等，采用分层分离架构，支持团队快速自助管理工具。
   - title: 多语言覆盖
     details: 支持 Java/C++/Objective-C/C#/JavaScript/Python/Go/PHP 等数29种语言，覆盖常用编程语言。
   - title: 增量全量分析
@@ -22,8 +22,8 @@ features:
     details: 自定义代码标准，逐步优化代码。
   - title: 全方位质量报告
     details: 图形化可视报告，轻松监管代码综合质量趋势。
-  - title: 全方位质量报告
-    details: 图形化可视报告，轻松监管代码综合质量趋势。
+  - title: 持续跟踪管理问题
+    details: 持续跟踪问题状态，支持主动标记处理问题、过滤问题。
   - title: 标准化 API 接口
     details: 提供标准化 API 接口，支持快速对接 DevOps 平台。
   - title: 分布式客户端
@@ -35,3 +35,11 @@ footer: MIT Licensed | Copyright © 1998-present Tencent. All Rights Reserved.
 
 [https://git.code.tencent.com/Tencent_Open_Source/CodeAnalysis.git](https://git.code.tencent.com/Tencent_Open_Source/CodeAnalysis.git)
 
+
+### 金牌🏅️服务微信群
+
+![微信群](https://tencent.github.io/CodeAnalysis/media/WechatQRCode.png)
+
+### 团队成员
+
+![团队成员](https://tencent.github.io/CodeAnalysis/media/TeamMembers.png)

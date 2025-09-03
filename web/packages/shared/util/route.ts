@@ -3,6 +3,7 @@
  */
 import qs from 'qs';
 import { pick, forEach, pickBy, toNumber, toString } from 'lodash';
+import { isTrue } from './check';
 import { URLSearch, Filter, FilterField, FilterFieldType } from './types';
 
 /**
@@ -109,7 +110,7 @@ export const getFilterFieldByURLSearch = (filterFields: FilterField[] = [], page
         filter[key] = value;
         break;
       case 'boolean':
-        filter[key] = value;
+        filter[key] = isTrue(value);
         break;
       case 'number':
         filter[key] = toNumber(value);
@@ -151,4 +152,21 @@ export const xssRedirectUri = (redirectUri: string, validHostNames = [window.loc
     return a.href;
   }
   return '';
+};
+
+/**
+ * 打开链接窗口
+ * @param url 地址
+ */
+export const openURL = (url: string, target: '_self' | '_blank' | '_parent' | '_top' = '_blank') => {
+  const id = 'a-open-url';
+  const aEle = document.createElement('a');
+  aEle.setAttribute('href', url);
+  aEle.setAttribute('target', target);
+  aEle.setAttribute('id', id);
+  // 防止反复添加
+  if (!document.getElementById(id)) {
+    document.body.appendChild(aEle);
+  }
+  aEle.click();
 };

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { isEmpty, concat } from 'lodash';
 import { Tabs, Input, Button, Spin, Divider } from 'coding-oa-uikit';
 
 // 项目内
 import { OrgStatusEnum, DEFAULT_TEAM_PAGER } from '@src/constant';
 import { getProjectsRouter, getWorkspaceRouter } from '@src/utils/getRoutePath';
-import Header from '@src/modules/layout/header';
+import Header from '@plat/modules/header';
 import { getTeams } from '@src/services/team';
 import TeamModal from './team-modal';
 import TeamCard from './team-card';
@@ -29,7 +29,6 @@ const Team = () => {
   const INIT_LOAD_SIZE = 50;
 
   const history = useHistory();
-  const { t } = useTranslation();
 
   useEffect(() => {
     getTeamList(false, DEFAULT_TEAM_PAGER.pageStart, INIT_LOAD_SIZE, {}, (list: any) => {
@@ -116,61 +115,61 @@ const Team = () => {
     <>
       <Header />
       {containerNode && ReactDOM.createPortal(<div className={style.teamContainer}>
-          <TeamModal
-            visible={visible}
-            data={data}
-            onCancel={() => setVisible(false)}
-            onOk={onCreateFinish}
-          />
-          <Tabs
-            defaultActiveKey="all"
-            size="large"
-            tabBarExtraContent={
-              <>
-                <Search
-                  allowClear
-                  defaultValue={name}
-                  value={name}
-                  size="middle"
-                  placeholder={t('团队名称')}
-                  onChange={e => setName(e.target.value)}
-                  onSearch={value => onSearch(value)}
-                  style={{ width: 200 }}
-                />
-                <Button
-                  className="ml-md"
-                  type="primary"
-                  onClick={() => {
-                    setVisible(true);
-                    setData(undefined);
-                  }}
-                >
-                  {t('创建团队')}
-                </Button>
-              </>
-            }
-          >
-            <Tabs.TabPane tab={t('所有团队')} key="all">
-              <div
-                className={style.teamWrapper}
-                id='team-wrapper'
-                onScroll={loadMoreTeam}
+        <TeamModal
+          visible={visible}
+          data={data}
+          onCancel={() => setVisible(false)}
+          onOk={onCreateFinish}
+        />
+        <Tabs
+          defaultActiveKey="all"
+          size="large"
+          tabBarExtraContent={
+            <>
+              <Search
+                allowClear
+                defaultValue={name}
+                value={name}
+                size="middle"
+                placeholder={t('团队名称')}
+                onChange={e => setName(e.target.value)}
+                onSearch={value => onSearch(value)}
+                style={{ width: 200 }}
+              />
+              <Button
+                className="ml-md"
+                type="primary"
+                onClick={() => {
+                  setVisible(true);
+                  setData(undefined);
+                }}
               >
-                  {list.map((item: any) => (
-                    <div
-                      key={item.id}
-                      className={style.team}
-                      onClick={() => onClickTeam(item)}
-                    >
-                      <TeamCard data={item} />
-                    </div>
-                  ))}
-                  <div style={{ textAlign: 'center' }}><Spin spinning={scrollLoading} /></div>
-              </div>
-              {!allLoaded && <Divider plain>{t('滚动加载更多团队')}</Divider>}
-            </Tabs.TabPane>
-          </Tabs>
-        </div>, containerNode)}
+                {t('创建团队')}
+              </Button>
+            </>
+          }
+        >
+          <Tabs.TabPane tab={t('所有团队')} key="all">
+            <div
+              className={style.teamWrapper}
+              id='team-wrapper'
+              onScroll={loadMoreTeam}
+            >
+              {list.map((item: any) => (
+                <div
+                  key={item.id}
+                  className={style.team}
+                  onClick={() => onClickTeam(item)}
+                >
+                  <TeamCard data={item} />
+                </div>
+              ))}
+              <div style={{ textAlign: 'center' }}><Spin spinning={scrollLoading} /></div>
+            </div>
+            {!allLoaded && <Divider plain>{t('滚动加载更多团队')}</Divider>}
+          </Tabs.TabPane>
+        </Tabs>
+      </div>, containerNode)}
     </>
   );
 };

@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 THL A29 Limited
+// Copyright (c) 2021-2025 Tencent
 //
 // This source code file is made available under MIT License
 // See LICENSE for details
@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { Button, Avatar, Row, Col, Modal, Select, message } from 'coding-oa-uikit';
 import PlusCircleIcon from 'coding-oa-uikit/lib/icon/PlusCircle';
 import UserIcon from 'coding-oa-uikit/lib/icon/User';
@@ -15,6 +15,7 @@ import { unionWith, isEqual } from 'lodash';
 
 // 项目内
 import { getUserImgUrl } from '@src/utils';
+import PageHeader from '@tencent/micro-frontend-shared/tdesign-component/page-header';
 import { getTeamMemberRouter } from '@src/utils/getRoutePath';
 
 // 模块内
@@ -24,7 +25,7 @@ import {
   getOrgMembers,
   delProjectTeamMember,
 } from '@src/services/common';
-import s from './style.scss';
+import s from '../style.scss';
 
 const PERM_ENUM = {
   ADMIN: 1,
@@ -89,7 +90,6 @@ const MemberItem = ({ list, role, onAddMemberClick, onRemoveMemberClick }: IMemb
 const Group = () => {
   const { orgSid, teamName }: any = useParams();
   const [allUsers, setAllUsers] = useState<Array<any>>([]);
-  const { t } = useTranslation();
 
   const [members, setMembers] = useState<any>({
     admins: [],
@@ -156,43 +156,45 @@ const Group = () => {
   };
 
   return (
-        <div className="pa-lg">
-            <div className="mb-lg">
-                <h3>{t('项目成员管理')}</h3>
-                <span className=" text-grey-6 fs-12">
-                    注：仅能添加团队内存在的成员，如需邀请成员，进入
-                    <Link to={getTeamMemberRouter(orgSid)}>团队成员管理</Link>页面邀请
-                </span>
-            </div>
-            <Modal
-                title={t('添加成员')}
-                visible={inviteVisb}
-                onOk={onOkHandle}
-                onCancel={() => setInviteVisb(false)}
-            >
-                <Select
-                    mode="multiple"
-                    placeholder={t('团队成员，可多选')}
-                    showSearch
-                    value={form.users}
-                    style={{ width: '100%' }}
-                    options={userOptions}
-                    onChange={onSelectUsersHandle}
-                />
-            </Modal>
-            <MemberItem
-                role={PERM_ENUM.ADMIN}
-                list={members.admins}
-                onAddMemberClick={onAddMemberHandle}
-                onRemoveMemberClick={onRemoveMemberHandle}
-            />
-            <MemberItem
-                role={PERM_ENUM.USER}
-                list={members.users}
-                onAddMemberClick={onAddMemberHandle}
-                onRemoveMemberClick={onRemoveMemberHandle}
-            />
-        </div>
+    <div>
+      <PageHeader
+        title='项目成员管理'
+        description={<span>
+          注：仅能添加团队内存在的成员，如需邀请成员，进入
+          <Link to={getTeamMemberRouter(orgSid)}>团队成员管理</Link>页面邀请
+        </span>}
+      />
+      <Modal
+        title={t('添加成员')}
+        visible={inviteVisb}
+        onOk={onOkHandle}
+        onCancel={() => setInviteVisb(false)}
+      >
+        <Select
+          mode="multiple"
+          placeholder={t('团队成员，可多选')}
+          showSearch
+          value={form.users}
+          style={{ width: '100%' }}
+          options={userOptions}
+          onChange={onSelectUsersHandle}
+        />
+      </Modal>
+      <div className={s.content}>
+        <MemberItem
+          role={PERM_ENUM.ADMIN}
+          list={members.admins}
+          onAddMemberClick={onAddMemberHandle}
+          onRemoveMemberClick={onRemoveMemberHandle}
+        />
+        <MemberItem
+          role={PERM_ENUM.USER}
+          list={members.users}
+          onAddMemberClick={onAddMemberHandle}
+          onRemoveMemberClick={onRemoveMemberHandle}
+        />
+      </div>
+    </div>
   );
 };
 

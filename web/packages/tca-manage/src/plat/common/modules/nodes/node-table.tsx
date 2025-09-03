@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { t } from '@src/utils/i18n';
 import { get, isEmpty } from 'lodash';
 import { Space, Button, MessagePlugin, PrimaryTableCol, TableRowData } from 'tdesign-react';
 import Search from '@tencent/micro-frontend-shared/tdesign-component/search';
@@ -45,9 +44,6 @@ const NodeTable = ({ tagOptions }: NodeTableProps) => {
 
   const [{ data, isLoading }, reload] = useFetch(nodeAPI.get, [filter]);
   const { results: listData = [], count = 0 } = data || {};
-
-  const history = useHistory();
-  const { t } = useTranslation();
 
   const onCreateOrUpdateHandle = (node: any = null) => {
     setVisible(true);
@@ -120,8 +116,14 @@ const NodeTable = ({ tagOptions }: NodeTableProps) => {
     {
       colKey: 'last_beat_time',
       title: t('最近上报心跳'),
-      width: 200,
+      width: 160,
       cell: ({ row }: any) => formatDateTime(get(row, 'last_beat_time')) || '- -',
+    },
+    {
+      colKey: 'created_time',
+      title: t('创建时间'),
+      width: 160,
+      cell: ({ row }: any) => formatDateTime(get(row, 'created_time')) || '- -',
     },
     {
       colKey: 'exec_tags',
@@ -154,7 +156,9 @@ const NodeTable = ({ tagOptions }: NodeTableProps) => {
             {t('编辑')}
           </a>
           <a
-            onClick={() => history.push(`/manage/nodes/${row.id}/process`)}
+            href={`/manage/nodemgr/nodes/${row.id}/process`}
+            target='_blank'
+            rel='noreferrer'
           >
             {t('工具进程')}
           </a>
