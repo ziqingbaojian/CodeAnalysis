@@ -72,7 +72,7 @@ deploy() {
         ;;
         docker-compose)
             LOG_INFO "Start tca using docker-compose"
-            source $TCA_SCRIPT_ROOT/deploy/tca_docker_compose.sh
+            source $TCA_SCRIPT_ROOT/deploy/tca_docker_compose.sh  # 调用 docker-compose 的 shell 脚本进行部署; /scripts 中
             interactive_install_docker
             interactive_install_docker_compose
             tca_docker_compose_main "$2"

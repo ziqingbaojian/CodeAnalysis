@@ -1,9 +1,9 @@
 #!/bin/bash
 
-CURRENT_SCRIPT_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")";pwd)
+CURRENT_SCRIPT_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")";pwd)  # 获取当前的绝对路径
 TCA_SCRIPT_ROOT=${TCA_SCRIPT_ROOT:-"$( cd "$(dirname $CURRENT_SCRIPT_PATH)"; pwd )"}
 
-source $TCA_SCRIPT_ROOT/utils.sh
+source $TCA_SCRIPT_ROOT/utils.sh  # 导入 utils.sh
 
 export DOCKER_INSTALL_FILE=${DOCKER_INSTALL_FILE:-/tmp/get-docker.sh}
 

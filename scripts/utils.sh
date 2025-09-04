@@ -1,9 +1,11 @@
 #!/bin/bash
 
+# 定义 info 等级的输出
 function LOG_INFO() {
 	echo -e "\033[32m[$(date "+%Y/%m/%d %H:%M:%S")] [INFO]: $@\033[0m"
 }
 
+# 打印 警告级别的日志
 function LOG_WARN() {
 	echo -e "\033[33m[$(date "+%Y/%m/%d %H:%M:%S")] [WARN]: $@\033[0m"
 }
@@ -23,6 +25,7 @@ function get_linux_os() {
 	echo "$linux_os"
 }
 
+# 定义错误的退出;
 function error_exit() {
     LOG_ERROR "$1" 1>&2
     exit 1

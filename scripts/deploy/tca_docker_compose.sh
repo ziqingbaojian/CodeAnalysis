@@ -1,15 +1,16 @@
 #!/bin/bash
 
-CURRENT_SCRIPT_PATH=$( cd "$(dirname ${BASH_SOURCE[0]})"; pwd )
+CURRENT_SCRIPT_PATH=$( cd "$(dirname ${BASH_SOURCE[0]})"; pwd )  # 定义当前的绝对路径;
 export TCA_SCRIPT_ROOT=${TCA_SCRIPT_ROOT:-"$( cd $(dirname $CURRENT_SCRIPT_PATH); pwd )"}
 export TCA_PROJECT_PATH=${TCA_PROJECT_PATH:-"$( cd $(dirname $TCA_SCRIPT_ROOT); pwd )"}
 
 source $TCA_SCRIPT_ROOT/utils.sh
-source $TCA_SCRIPT_ROOT/server/_base.sh
+source $TCA_SCRIPT_ROOT/server/_base.sh  # 导入定义的路径,以及部署的过程中输出的配置文件;
 
-CODEDOG_DBUSER=${CODEDOG_DBUSER:-root}
+CODEDOG_DBUSER=${CODEDOG_DBUSER:-root}  # 设置默认值; 设置用户名与密码;
 CODEDOG_DBPASSWD=${CODEDOG_DBPASSWD:-'TCA!@#2021'}
 
+# 打印介绍;
 function tca_introduction() {
     LOG_INFO "===========================================================" 
     LOG_INFO "                  _______    _____                         "
@@ -69,12 +70,15 @@ function set_image_with_arch() {
     fi
 }
 
+# 强制重新常见 mysql 与 redis
 function start_db() {
     docker-compose up --force-recreate -d mysql redis
 }
 
+# 初始化的数据库的数据;
 function init_db() {
     db_container=$(docker-compose ps | grep mysql | awk '{print $1}')
+    # 执行挂载进去的 sql 文件进行操作, 进行了创建数据库的操作, 但是没有建表与建立用户;
    docker-compose exec mysql /bin/bash -c \
         "printf 'wait db [DB default password: TCA!@#2021]\n'; \
          until \$(MYSQL_PWD=${CODEDOG_DBPASSWD} mysql -u${CODEDOG_DBUSER} -e '\s' > /dev/null 2>&1); do \
@@ -95,6 +99,7 @@ function init_file() {
 function init_login() {
     mkdir -p $CURRENT_PATH/server/projects/login
     docker-compose up -d login-server
+    # 启动服务之后, 在容器内部进行数据初始化的操作;
     docker-compose exec login-server bash -c \
         "python manage.py migrate --noinput --traceback; \
          python manage.py createcachetable; \
@@ -121,55 +126,64 @@ function init_main() {
 function init_analysis() {
     mkdir -p $CURRENT_PATH/server/projects/analysis/log
     docker-compose up -d analysis-server
+    # 在 django 中执行处理好的服务信息;
     docker-compose exec analysis-server /bin/bash -c \
         "python manage.py migrate --noinput --traceback; \
          python manage.py createcachetable; \
          python manage.py initialuser; \
         "
 }
-
+# 启动所有的服务;
 function start_all_services() {
-    docker-compose up -d
+    docker-compose up -d  # 对于处于运行状态的容器,没有修改配置的话, 会保持当前运行状态
 }
 
+# 停止全部的服务;
 function stop_all_services() {
     docker-compose stop
 }
 
+# 部署全部的服务,
 function deploy_all_services() {
     cd $TCA_PROJECT_PATH
     set_image_with_arch
+    # 如果函数执行失败, 则执行 error_exit 并打印参数的信息;
+
+    # 1. 启动系统级的依赖中间件, MYSQL Redis
     start_db || error_exit "start db failed"
+    # 2. 启动需要进行数据初始化的服务;
     init_db || error_exit "init db failed"
     init_file || error_exit "init file server failed"
     init_login || error_exit "init login server failed"
     init_analysis || error_exit "init analysis server failed"
     init_main || error_exit "init main server failed"
-    start_all_services
-    tca_introduction
+    # 启动所有的服务;
+    start_all_services  # 由于docker-compose.yml 的文件没有发生变化;
+    tca_introduction  # 打印 docker-compose 部署方式的需要的介绍;
 }
 
-
+# 获取命令行的参数
 function tca_docker_compose_main() {
-    command=$1
+    command=$1  # 获取命令行的参数;
     case $command in
         deploy)
             LOG_INFO "Deploy tca docker-compose"
-            deploy_all_services
+            deploy_all_services  # 部署全部的服务, 先启动中间件 + 初始化 + 启动全部服务;
         ;;
         start)
             LOG_INFO "Start tca docker-compose"
-            start_all_services
+            start_all_services  # 直接启动全部服务
         ;;
         stop)
             LOG_INFO "Stop tca docker-compose"
-            stop_all_services
+            stop_all_services  # 停止全部服务;
         ;;
         build)
-            LOG_INFO "Build tca image"
+            LOG_INFO "Build tca image"  # 构建镜像的操作;
             docker-compose build main-server analysis-server file-server login-server scmproxy client
         ;;
         *)
+            # 其他的命令参数, 不支持启动;
             LOG_ERROR "'$command' not support."
             exit 1
     esac
