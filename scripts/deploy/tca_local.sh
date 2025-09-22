@@ -1,15 +1,17 @@
 #!/bin/bash
 # 启动 TCA Web 与 Server服务
 
+# 获取路径,
 CURRENT_SCRIPT_PATH=$( cd "$(dirname ${BASH_SOURCE[0]})"; pwd )
 export TCA_SCRIPT_ROOT=${TCA_SCRIPT_ROOT:-"$( cd $(dirname $CURRENT_SCRIPT_PATH); pwd )"}
 
-source $TCA_SCRIPT_ROOT/utils.sh
-source $TCA_SCRIPT_ROOT/config.sh
-source $TCA_SCRIPT_ROOT/base/install_python.sh
-source $TCA_SCRIPT_ROOT/base/install_db.sh
-source $TCA_SCRIPT_ROOT/base/install_nginx.sh
-source $TCA_SCRIPT_ROOT/server/init_config.sh
+# 加载依赖的 shell 脚本文件;
+source $TCA_SCRIPT_ROOT/utils.sh  # 导入开源的
+source $TCA_SCRIPT_ROOT/config.sh  # 系统启动需要的环境变量
+source $TCA_SCRIPT_ROOT/base/install_python.sh  # 安装 Python3.7
+source $TCA_SCRIPT_ROOT/base/install_db.sh  # 安装 redis, mysql
+source $TCA_SCRIPT_ROOT/base/install_nginx.sh  # 安装 Nginx
+source $TCA_SCRIPT_ROOT/server/init_config.sh  # 初始化配置, 处理开源上没有的私有配置文件, 以及缺少的日志目录, 移动 Nginx 的配置文件;
 source $TCA_SCRIPT_ROOT/server/init_data.sh
 source $TCA_SCRIPT_ROOT/web/init.sh
 source $TCA_SCRIPT_ROOT/server/start.sh

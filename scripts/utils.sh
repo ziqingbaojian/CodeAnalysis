@@ -32,6 +32,7 @@ function error_exit() {
 }
 
 function command_exists() {
+  # 使用原生内置的命令进行检查;
 	command -v "$@" > /dev/null 2>&1
 }
 

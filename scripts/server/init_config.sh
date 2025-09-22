@@ -7,6 +7,7 @@ source $TCA_SCRIPT_ROOT/utils.sh
 source $TCA_SCRIPT_ROOT/config.sh
 source $TCA_SCRIPT_ROOT/server/_base.sh
 
+# 创建需要的目录, 主要为服务对应的日志目录;
 function create_server_dir() {
     LOG_INFO "[TCAServer] Create server directory"
     mkdir -p $TCA_SERVER_MAIN_PATH/log
@@ -43,34 +44,45 @@ function create_server_dir() {
     fi
 }
 
+# 复制服务端的配置文件, 创建对应的软连接
 function copy_server_config() {
     LOG_INFO "[TCAServer] Copy server config"
+
+    # 处理 main 服务;
+    # 删除 codedog 下的本地私有配置文件
     rm -f $TCA_SERVER_MAIN_PATH/codedog/settings/local.py
+    # 创建的 local_main.py 开源的文件为配置的软连接, 保证执行不出错;
     ln -s $TCA_SERVER_PATH/configs/django/local_main.py $TCA_SERVER_MAIN_PATH/codedog/settings/local.py
 
+    # 处理分析服务
     rm -f $TCA_SERVER_ANALYSIS_PATH/codedog/settings/local.py
     ln -s $TCA_SERVER_PATH/configs/django/local_analysis.py $TCA_SERVER_ANALYSIS_PATH/codedog/settings/local.py
 
-    mkdir -p $TCA_SERVER_FILE_PATH/codedog_file_server/env
+    # 处理文件的服务;
+    mkdir -p $TCA_SERVER_FILE_PATH/codedog_file_server/env  # 创建 env 的文件夹;
     rm -f $TCA_SERVER_FILE_PATH/codedog_file_server/env/local.py
     ln -s $TCA_SERVER_PATH/configs/django/local_file.py $TCA_SERVER_FILE_PATH/codedog_file_server/env/local.py
 
+    # 处理 Login 的服务;
     rm -f $TCA_SERVER_LOGIN_PATH/apps/settings/local.py
     ln -s $TCA_SERVER_PATH/configs/django/local_login.py $TCA_SERVER_LOGIN_PATH/apps/settings/local.py
 
-    if [ ! -d $NGINX_CONF_PATH ]; then
+    # 检查 Nginx 的路径是否存在
+    if [ ! -d $NGINX_CONF_PATH ]; then  # todo 这里需要百度一下?
         LOG_ERROR "[TCAServer] $NGINX_CONF_PATH not exist."
         LOG_WARN "If you installed nginx into other path, you can set change '$TCA_SCRIPT_ROOT/config.sh' "
         LOG_WARN "or set environment variable 'NGINX_CONF_PATH' with actual conf path"
         return 1
     fi
 
+    # 关于 if 的条件判断的问题;
     if [ -f $NGINX_CONF_PATH/tca_8000.conf ]; then
         rm -f $NGINX_CONF_PATH/tca_8000.conf
     fi
     if [ -f $NGINX_CONF_PATH/tca_file_local.conf ]; then
         rm -f $NGINX_CONF_PATH/tca_file_local.conf
     fi
+    # 复制 Nginx 的配置文件到 Nginx 的目录下
     cp $TCA_SERVER_PATH/configs/nginx/tca_8000.conf $NGINX_CONF_PATH/tca_8000.conf
     cp $TCA_SERVER_PATH/configs/nginx/tca_file_local.conf $NGINX_CONF_PATH/tca_file_local.conf
     # cp $CURRENT_PATH/configs/nginx/tca_file_minio.conf $NGINX_CONF_PATH/tca_file_local.conf

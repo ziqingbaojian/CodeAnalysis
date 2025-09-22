@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# 安装 Nginx 的服务
 CURRENT_SCRIPT_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")";pwd)
 TCA_SCRIPT_ROOT=${TCA_SCRIPT_ROOT:-"$(dirname $CURRENT_SCRIPT_PATH; pwd)"}
 NGINX_SRC_URL=${NGINX_SRC_URL:-"http://nginx.org/download/nginx-1.20.2.tar.gz"}
@@ -10,6 +11,7 @@ NGINX_LOG_DIR=${NGINX_LOG_PATH:-"/var/log/nginx"}
 
 source $TCA_SCRIPT_ROOT/utils.sh
 
+# 检查 Nginx 的命令是否存在;
 function check_nginx() {
     ret=""
     if command_exists nginx; then
@@ -20,6 +22,7 @@ function check_nginx() {
     echo "$ret"
 }
 
+# 使用 Sed 编辑 Nginx 的配置;
 function config_nginx() {
     LOG_INFO "[NginxInstall] Comment nginx default listen"
     sed -ri 's/^([[:space:]]*)(server_name|listen)/\1#\2/' /etc/nginx/nginx.conf
@@ -39,11 +42,13 @@ function install_nginx_using_src() {
     config_nginx_from_src_install
 }
 
+# 使用 wget 下载 nginx 的源码包;
 function download_nginx_src() {
     LOG_INFO "[NginxInstall] Download nginx src from $NGINX_SRC_URL, save to $NGINX_SRC_PKG_PATH"
     wget -O $NGINX_SRC_PKG_PATH $NGINX_SRC_URL || error_exit "Download nginx src failed"
 }
 
+# 使用 apt 或者 yum 的方式进行安装;
 function pre_install_for_nginx() {
     LOG_INFO "[NginxInstall] Pre install tools"
     case "$LINUX_OS" in
@@ -62,6 +67,7 @@ function pre_install_for_nginx() {
     LOG_INFO "[NginxInstall] Pre install tools successfully."
 }
 
+# 编译安装 Nginx
 function compile_and_link_nginx() {
     LOG_INFO "[NginxInstall] Extract into $NGINX_SRC_PATH"
     tar zxf $NGINX_SRC_PKG_PATH -C $NGINX_SRC_DIR && cd $NGINX_SRC_PATH
@@ -79,6 +85,7 @@ function compile_and_link_nginx() {
     mkdir /etc/nginx/conf.d/ $NGINX_LOG_DIR
 }
 
+# 备份原有的配置文件,并且修改一些常见的配置;
 function config_nginx_from_src_install() {
     LOG_INFO "[NginxInstall] Config nginx from src"
     cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
@@ -105,6 +112,7 @@ http {
 }" > /etc/nginx/nginx.conf
 }
 
+# 非交互式的联网安装 Nginx ,apt 中默认添加了 -y 参数;
 function quiet_install_nginx() {
     ret=$( check_nginx )
     if [ "$ret" == "true" ]; then
@@ -138,6 +146,7 @@ function quiet_install_nginx() {
     config_nginx
 }
 
+# 交互式联网安装
 function interactive_install_nginx() {
     ret=$( check_nginx )
     if [ "$ret" == "true" ]; then

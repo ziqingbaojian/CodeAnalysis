@@ -1,7 +1,7 @@
 #!/bin/bash
 CURRENT_SCRIPT_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")";pwd)
 TCA_SCRIPT_ROOT=${TCA_SCRIPT_ROOT:-"$(dirname $CURRENT_SCRIPT_PATH; pwd)"}
-PYTHON_SRC_URL=${PYTHON_SRC_URL:-"https://www.python.org/ftp/python/3.7.12/Python-3.7.12.tgz"}
+PYTHON_SRC_URL=${PYTHON_SRC_URL:-"https://www.python.org/ftp/python/3.7.12/Python-3.7.12.tgz"}  # 下载 Python 的解释器包;
 PYTHON_SRC_PKG_PATH=${PYTHON_SRC_PKG_PATH:-"/tmp/Python-3.7.12.tgz"}
 PYTHON_SRC_PKG_CACHE_PATH=${PYTHON_SRC_PKG_CACHE_PATH}
 PYTHON_SRC_PATH=${PYTHON_SRC_PATH:-"/usr/local/src/Python-3.7.12"}
@@ -11,8 +11,9 @@ PYPI_MIRROR_DOMAIN=${PYPI_MIRROR_DOMAIN:-"mirrors.cloud.tencent.com"}
 PYPI_MIRROR_URL="https://$PYPI_MIRROR_DOMAIN/pypi/simple"
 LINUX_OS=""
 
-source $TCA_SCRIPT_ROOT/utils.sh
+source $TCA_SCRIPT_ROOT/utils.sh  # 导入工具
 
+# 检查的 Python 的命令是否存在
 function check_python() {
     ret=""
     if command_exists python; then
@@ -28,6 +29,7 @@ function check_python() {
     echo "$ret"
 }
 
+# 检查 pip 的缓存;
 function check_python_pkg_cache() {
     if [ -n "$PYTHON_SRC_PKG_CACHE_PATH" ]; then
         ret="true"
@@ -37,6 +39,7 @@ function check_python_pkg_cache() {
     echo "$ret"
 }
 
+# 使用 wget 下载 Python 解释器;
 function download_python_src() {
     LOG_INFO "[PythonInstall] Download Python src from $PYTHON_SRC_URL, save to $PYTHON_SRC_PKG_PATH"
     LOG_WARN "    * 注意：如果下载失败或速度较慢，可以中断当前脚本（中断后可以重新启动），然后手动下载上述链接的Python包，通过环境变量 [ PYTHON_SRC_PKG_CACHE_PATH ] 指定Python包的路径"
@@ -44,6 +47,7 @@ function download_python_src() {
     wget -O $PYTHON_SRC_PKG_PATH $PYTHON_SRC_URL || error_exit "Download Python src failed"
 }
 
+# 此处使用的是编译安装的方法, 安装编译的时候的需要 C 与 C++ 的依赖.
 function pre_install_for_python() {
     ## 安装编译依赖组件
     LOG_INFO "[PythonInstall] Pre install tools"
@@ -96,6 +100,7 @@ function compile_and_link_python() {
     export PATH=/usr/local/bin:$PATH
 }
 
+# 设置 pypi 的镜像.
 function set_pypi_mirror() {
     LOG_INFO "[PythonInstall] Set pypi config [ $PYPI_MIRROR_URL ]"
     mkdir -p ~/.pip/
@@ -106,6 +111,7 @@ trusted-host=$PYPI_MIRROR_DOMAIN" > ~/.pip/pip.conf
     use_right_pip "install -q -U pip"
 }
 
+# 一键安装安装 Python
 function quiet_install_python() {
     LINUX_OS=$( get_linux_os )
     LOG_INFO "[PythonInstall] Check Python version"
@@ -130,6 +136,7 @@ function quiet_install_python() {
     LOG_INFO "[PythonInstall] Install Python3.7.12 successfully."
 }
 
+# 交互形式安装 Python
 function interactive_install_python() {
     ret=$( check_python )
     if [ "$ret" == "true" ]; then
