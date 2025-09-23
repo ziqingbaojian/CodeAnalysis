@@ -27,7 +27,10 @@ MICRO_FRONTEND_APPS="login tca-layout tca-analysis tca-manage"
 # 清理资源文件
 function clear_assets() {
   LOG_WARN "将路径下的资源文件和前端nginx配置备份到 ${TCA_WEB_DEPLOY_PATH}_bak 下..."
+
+  # 检查部署的目录是否存在;
   if [ -d "$TCA_WEB_DEPLOY_PATH" ]; then
+    # 将文件下的内容进行复制备份;
     cp -r "$TCA_WEB_DEPLOY_PATH"/ "${TCA_WEB_DEPLOY_PATH}"_bak/
   fi
 
@@ -35,6 +38,7 @@ function clear_assets() {
     cp -r "$NGINX_CONF_PATH"/tca_ingress.conf "${TCA_WEB_DEPLOY_PATH}"_bak/
   fi
 
+  # 清楚 Nginx 代理的配置文件;
   LOG_INFO "开始清理路径下的资源文件 $TCA_WEB_DEPLOY_PATH ..."
   rm -rf "${TCA_WEB_DEPLOY_PATH:?}"/
   LOG_INFO "开始清理前端nginx配置 ..."

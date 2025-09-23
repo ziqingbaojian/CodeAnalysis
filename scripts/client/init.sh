@@ -7,6 +7,7 @@ export TCA_CLIENT_PATH=$TCA_PROJECT_PATH/client
 
 source $TCA_SCRIPT_ROOT/utils.sh
 
+# 安装依赖包
 function install_client_requirments() {
     LOG_INFO "[TCAClient] Install client dependency packages..."
     use_right_pip "install -q -r $TCA_CLIENT_PATH/requirements/app_reqs.pip"

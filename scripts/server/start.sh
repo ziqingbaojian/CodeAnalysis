@@ -8,14 +8,17 @@ source $TCA_SCRIPT_ROOT/server/_base.sh
 source $TCA_SCRIPT_ROOT/server/stop.sh
 
 
+# 启动 main 服务
 function start_main() {
     LOG_INFO "start main server, worker and beat"
     cd $TCA_SERVER_MAIN_PATH
-    gunicorn codedog.wsgi -c $TCA_MAIN_GUNICORN_CONF_FILE
+    gunicorn codedog.wsgi -c $TCA_MAIN_GUNICORN_CONF_FILE  # wsgi 设置的任务的启动;
+    # 启动 celery 任务队列
     nohup celery -A codedog worker -l DEBUG --logfile $TCA_MAIN_CELERY_WORKER_LOG  --pidfile $TCA_MAIN_CELERY_WORKER_PID_FILE 2>worker_error.out &
     nohup celery -A codedog beat -S redbeat.RedBeatScheduler -l DEBUG --logfile $TCA_MAIN_CELERY_BEAT_LOG --pidfile $TCA_MAIN_CELERY_BEAT_PID_FILE 2>beat_error.out &
 }
 
+# 重启 main 服务;
 function restart_main() {
     stop_main_server
     stop_main_worker
@@ -23,6 +26,7 @@ function restart_main() {
     start_main
 }
 
+# 启动分析的服务;
 function start_analysis() {
     LOG_INFO "start analysis server and worker"
     cd $TCA_SERVER_ANALYSIS_PATH
@@ -30,12 +34,14 @@ function start_analysis() {
     nohup celery -A codedog worker -l DEBUG --logfile $TCA_ANALYSIS_CELERY_WORKER_LOG  --pidfile $TCA_ANALYSIS_CELERY_WORKER_PID_FILE 2>worker_error.out &
 }
 
+# 重启分析的服务
 function restart_analysis() {
     stop_analysis_server
     stop_analysis_worker
     start_analysis
 }
 
+# 重启文件的服务;
 function start_file() {
     LOG_INFO "start file server"
     cd $TCA_SERVER_FILE_PATH
@@ -58,6 +64,7 @@ function restart_login() {
     start_login
 }
 
+# SCM 代理的服务
 function start_scmproxy() {
     LOG_INFO "start scmproxy server"
     cd $TCA_SERVER_SCMPROXY_PATH
@@ -69,6 +76,7 @@ function restart_scmproxy() {
     start_scmproxy
 }
 
+# 启动 Nginx 的服务;
 function start_nginx() {
     LOG_INFO "start nginx"
      nginx_is_start=$(ps -C nginx --no-header | wc -l)
@@ -80,6 +88,7 @@ function start_nginx() {
     fi
 }
 
+# 启动全部的服务;
 function start_tca_server() {
     stop_tca_server
     start_main

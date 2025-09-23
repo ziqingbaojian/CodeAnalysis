@@ -26,6 +26,7 @@ function check_nginx() {
 function config_nginx() {
     LOG_INFO "[NginxInstall] Comment nginx default listen"
     sed -ri 's/^([[:space:]]*)(server_name|listen)/\1#\2/' /etc/nginx/nginx.conf
+    # 检查文件是否存在;
     if [ -f "/etc/nginx/sites-enabled/default" ]; then
         sed -ri 's/^([[:space:]]*)(server_name|listen)/\1#\2/' /etc/nginx/sites-enabled/default
     fi

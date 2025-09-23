@@ -59,12 +59,14 @@ function install_base() {
 }
 
 function get_target_process(){
+  # 检查进程的命令;
 	proc_name=$1
 	pids=`ps -ef | grep "$proc_name" | grep -v grep | awk '{print $2}'`
 	echo $pids
 }
 
 function check_target_process_exist() {
+	# 检查进程是否存在;
 	proc_name=$1
 	pids=$( get_target_process "$proc_name" )
 	ret=""

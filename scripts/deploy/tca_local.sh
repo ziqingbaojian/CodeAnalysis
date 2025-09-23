@@ -12,21 +12,23 @@ source $TCA_SCRIPT_ROOT/base/install_python.sh  # 安装 Python3.7
 source $TCA_SCRIPT_ROOT/base/install_db.sh  # 安装 redis, mysql
 source $TCA_SCRIPT_ROOT/base/install_nginx.sh  # 安装 Nginx
 source $TCA_SCRIPT_ROOT/server/init_config.sh  # 初始化配置, 处理开源上没有的私有配置文件, 以及缺少的日志目录, 移动 Nginx 的配置文件;
-source $TCA_SCRIPT_ROOT/server/init_data.sh
-source $TCA_SCRIPT_ROOT/web/init.sh
+source $TCA_SCRIPT_ROOT/server/init_data.sh  # 检查 mysql 的命令, 并且初始化数据;
+source $TCA_SCRIPT_ROOT/web/init.sh  # 部署前端需要的 nginx 文件;
 source $TCA_SCRIPT_ROOT/server/start.sh
-source $TCA_SCRIPT_ROOT/server/stop.sh
-source $TCA_SCRIPT_ROOT/server/healthcheck.sh
-source $TCA_SCRIPT_ROOT/client/init.sh
-source $TCA_SCRIPT_ROOT/client/check.sh
-source $TCA_SCRIPT_ROOT/client/start.sh
-source $TCA_SCRIPT_ROOT/client/stop.sh
+source $TCA_SCRIPT_ROOT/server/stop.sh  # 停止服务;
+source $TCA_SCRIPT_ROOT/server/healthcheck.sh  # 健康检查的脚本;
+source $TCA_SCRIPT_ROOT/client/init.sh  # 初始化客户端
+source $TCA_SCRIPT_ROOT/client/check.sh  # 检查启动
+source $TCA_SCRIPT_ROOT/client/start.sh   # 启动
+source $TCA_SCRIPT_ROOT/client/stop.sh  # 停止终端客户端;
 
 
+# 安装服务启动的依赖,
 function tca_local_install() {
     service=$1
     case $service in
         base)
+            # 安装系统中间件;
             LOG_INFO "Install base software: Python3.7, Redis, Mariadb(or MySQL), Nginx"
             interactive_install_python
             interactive_install_redis
@@ -34,6 +36,7 @@ function tca_local_install() {
             interactive_install_nginx
         ;;
         server)
+           # 初始化配置以及初始化数据
             LOG_INFO "Init tca server config"
             init_server_config
             init_server_db_and_data
@@ -47,6 +50,7 @@ function tca_local_install() {
             init_client_config
         ;;
         tca)
+            # 加载配置与输出
             LOG_INFO "Init tca server config"
             init_server_config
             init_server_db_and_data
@@ -56,6 +60,7 @@ function tca_local_install() {
             init_client_config
         ;;
         *)
+            # 交互式安装 python redis 以及其他的服务, 加载配置;
             LOG_INFO "1. Install base software: Python, Redis, Mariadb(or MySQL), Nginx"
             interactive_install_python
             interactive_install_redis
@@ -75,6 +80,7 @@ function tca_local_install() {
     esac
 }
 
+# 启动指定的服务
 function tca_local_start() {
     LOG_INFO "start tca server"
     service=$1
@@ -110,12 +116,13 @@ function tca_local_start() {
             start_client
         ;;
         *)
-            start_tca_server
+            start_tca_server  # 启动全部的服务, server/start.sh
             start_client
         ;;
     esac
 }
 
+# 停止指定的目录;
 function tca_local_stop() {
     service=$1
     case "$service" in
@@ -143,12 +150,13 @@ function tca_local_stop() {
             stop_client
         ;;
         *)
-            stop_tca_server
+            stop_tca_server  # 停止全部的服务;
             stop_client
         ;;
     esac
 }
 
+# 打印帮助的信息;
 function tca_local_help() {
     LOG_INFO "format: ./quick_install.sh local command"
     LOG_INFO "example: ./quick_install.sh local deploy"
@@ -162,6 +170,7 @@ function tca_local_help() {
     LOG_INFO "7. help   : print script document."
 }
 
+# 接收命令以及参数, 完成分发的具体执行;
 function tca_local_main() {
     pre_check
     command=$1

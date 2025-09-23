@@ -15,7 +15,7 @@ services:
         "--server-id=1"
       ]
     environment:
-      MYSQL_DATABASE: "codedog_db"
+      MYSQL_DATABASE: "codedog_db"  # 此处直接指定数据库的名称以及密码;
       MYSQL_ROOT_PASSWORD: "TCA!@#2021"
     volumes:
       - ./.docker_data/mysql:/var/lib/mysql
@@ -34,7 +34,7 @@ services:
     restart: always
 
   main-server:
-    env_file:
+    env_file:  # 指定挂载的文件
       - ./server/dockerconfs/.env.local
     image: tencenttca/tca-main:latest
     build:

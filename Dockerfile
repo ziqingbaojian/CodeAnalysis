@@ -1,4 +1,5 @@
 FROM python:3.7-slim-bullseye
+# 拉取 python 镜像
 
 ENV REDIS_PASSWD=tca2022
 ENV MYSQL_PASSWORD=TCA!@#2021
@@ -34,6 +35,7 @@ WORKDIR /CodeAnalysis/
 
 EXPOSE 80 8000 9001
 
+# 赋予可执行的权限, 执行init.sh
 RUN chmod +x /CodeAnalysis/scripts/docker/init.sh \
     && chmod +x /CodeAnalysis/scripts/docker/start.sh \
     && bash /CodeAnalysis/scripts/docker/init.sh \

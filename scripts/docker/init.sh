@@ -7,7 +7,7 @@ TCA_INIT_FLAG=${TCA_INIT_FLAG:-"true"}
 source $TCA_SCRIPT_ROOT/utils.sh
 source $TCA_SCRIPT_ROOT/config.sh
 source $TCA_SCRIPT_ROOT/server/init_config.sh
-source $TCA_SCRIPT_ROOT/client/init.sh
+source $TCA_SCRIPT_ROOT/client/init.sh  # 到处依赖脚本;
 
 # 配置DB初始化密码
 sed "s/TCA_MYSQL_PASSWORD/${MYSQL_PASSWORD}/g" /CodeAnalysis/server/sql/_temp.sql > /CodeAnalysis/server/sql/reset_root_password.sql
